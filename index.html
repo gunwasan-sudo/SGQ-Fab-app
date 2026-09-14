@@ -227,17 +227,25 @@ function call(action, payload){
   });
 }
 async function callFetch(action, payload){
-  const ac = new AbortController(); const timer = setTimeout(() => ac.abort(), 30000);
-  let txt;
-  try {
-    const r = await fetch(API_URL, { method:'POST', redirect:'follow', signal: ac.signal,
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },   // text/plain = ไม่มี CORS preflight
-      body: JSON.stringify({ action, payload, idToken: S.idToken }) });
-    txt = await r.text();
-  } catch(e) {
-    throw new Error(e.name === 'AbortError' ? 'เรียก "' + action + '" ไม่ตอบกลับภายใน 30 วินาที' : 'ติดต่อเซิร์ฟเวอร์ไม่ได้: ' + (e.message || e));
-  } finally { clearTimeout(timer); }
-  let o; try { o = JSON.parse(txt); } catch(e) { throw new Error('อ่านผลลัพธ์ไม่ได้: ' + String(txt).substring(0,150)); }
+  // Apps Script ตอบผ่าน redirect ไป script.googleusercontent.com ซึ่งล้มเหลวสุ่ม ~1 ใน 6 ครั้ง (ได้หน้า HTML 'ไม่พบเพจ')
+  // → ยิงซ้ำสูงสุด 4 ครั้งด้วย reqId เดิม (backend กันเขียนซ้ำด้วย reqId)
+  const reqId = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+  const body = JSON.stringify({ action, payload, idToken: S.idToken, reqId });
+  let o, lastErr;
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    const ac = new AbortController(); const timer = setTimeout(() => ac.abort(), 30000);
+    try {
+      const r = await fetch(API_URL, { method:'POST', redirect:'follow', signal: ac.signal,
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body });   // text/plain = ไม่มี CORS preflight
+      const txt = await r.text();
+      try { o = JSON.parse(txt); } catch(e) { throw new Error('อ่านผลลัพธ์ไม่ได้: ' + String(txt).substring(0,150)); }
+      lastErr = null; break;
+    } catch(e) {
+      lastErr = e.name === 'AbortError' ? new Error('เรียก "' + action + '" ไม่ตอบกลับภายใน 30 วินาที') : e;
+      if (attempt < 4) await new Promise(r => setTimeout(r, 400 * attempt));
+    } finally { clearTimeout(timer); }
+  }
+  if (lastErr) throw lastErr;
   if (o.ok) return o;
   if (o.code === 'token' && LIFF_ID && typeof liff !== 'undefined') {   // token หมดอายุ → ล็อกอินใหม่
     try { liff.logout(); } catch(e) {}
