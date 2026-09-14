@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>SGQ ตารางงานทีมช่าง</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
+<style>
+  :root{--bg:#f3f4f6;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;--brand:#0f4c81;--brand2:#1e6fb5;
+    --planned:#6b7280;--in_progress:#d97706;--done:#16a34a;--postponed:#7c3aed;--cancelled:#dc2626;
+    --t-วัดหน้างาน:#0284c7;--t-ตัดประกอบ:#7c3aed;--t-ติดตั้ง:#16a34a;--t-แก้งาน:#d97706;--t-ส่งมอบ:#0f766e;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:"Noto Sans Thai","Noto Sans Myanmar",system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:17px;padding-bottom:90px}
+  header{background:var(--brand);color:#fff;padding:10px 12px 0;position:sticky;top:0;z-index:20}
+  .top{display:flex;align-items:center;gap:8px}
+  .top h1{font-size:18px;margin:0;flex:1;font-weight:700}
+  .top .who{font-size:13px;opacity:.9;text-align:right;line-height:1.2}
+  .lang{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:16px;padding:3px 10px;font-size:13px}
+  .tabs{display:flex;gap:8px;margin-top:10px;padding-bottom:10px}
+  .tabs button{flex:1;border:1px solid rgba(255,255,255,.35);border-radius:10px;background:linear-gradient(#2a6aa8,#1a5590);color:#fff;padding:8px 0;font-size:16px;font-weight:600;font-family:inherit;box-shadow:0 3px 0 rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .08s}
+  .tabs button:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
+  .tabs button.on{background:linear-gradient(#ffffff,#e8eef5);color:var(--brand);border-color:#fff;box-shadow:0 4px 8px rgba(0,0,0,.35),inset 0 1px 0 #fff;transform:translateY(-1px)}
+  .nav{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:86px;z-index:19}
+  .nav button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-size:16px;font-family:inherit}
+  .nav .lbl{flex:1;text-align:center;font-weight:700;font-size:17px}
+  .chips{display:flex;gap:6px;padding:8px 12px;overflow-x:auto}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:16px;padding:4px 12px;font-size:15px;white-space:nowrap;font-family:inherit}
+  .chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+  main{padding:0 12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .card.done{opacity:.72}
+  .row{display:flex;align-items:center;gap:8px}
+  .badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:13px;color:#fff;font-weight:500}
+  .st{display:inline-block;padding:2px 8px;border-radius:12px;font-size:13px;color:#fff}
+  .title{font-weight:700;font-size:18px;margin:4px 0}
+  .meta{color:var(--muted);font-size:15px;line-height:1.5}
+  .meta a{color:var(--brand2)}
+  .ppl{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+  .ppl span{background:#eef2ff;color:#3730a3;border-radius:6px;padding:2px 8px;font-size:13px}
+  .ppl span.ci{background:#dcfce7;color:#166534}
+  .ppl span.nci{background:#fee2e2;color:#991b1b}
+  .ppl span.me{outline:2px solid #3730a3}
+  .acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .btn{border:none;border-radius:8px;padding:8px 14px;font-size:16px;font-family:inherit;background:#e5e7eb;color:#111}
+  .btn.p{background:var(--brand);color:#fff}.btn.g{background:var(--done);color:#fff}.btn.w{background:var(--in_progress);color:#fff}.btn.d{background:var(--cancelled);color:#fff}
+  .btn.sm{padding:5px 10px;font-size:15px}
+  .empty{text-align:center;color:var(--muted);padding:30px 0}
+  .banner{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:16px}
+  .leaveline{background:#f1f5f9;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:15px;color:#334155}
+  /* week */
+  .wk{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:12px}
+  table.wk-t{border-collapse:collapse;min-width:780px;width:100%}
+  .wk-t th,.wk-t td{border:1px solid var(--line);vertical-align:top;padding:4px;font-size:13px}
+  .wk-t th{background:#f8fafc;font-weight:600;position:sticky;top:0}
+  .wk-t th.today,.wk-t td.today{background:#eff6ff}
+  .wk-t th.hol,.wk-t td.hol{background:#fff1f2}
+  .wk-t td:first-child,.wk-t th:first-child{position:sticky;left:0;background:#f8fafc;font-weight:600;min-width:80px;z-index:1}
+  .cell-chip{display:block;border-radius:5px;padding:2px 5px;margin-bottom:3px;color:#fff;font-size:12px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
+  .cell-chip.lv{background:#94a3b8}
+  .cell-chip.done{opacity:.55;text-decoration:line-through}
+  /* month */
+  .mo{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .mo .h{background:#f8fafc;text-align:center;font-size:13px;padding:6px 0;font-weight:600}
+  .mo .d{background:#fff;min-height:82px;min-width:0;overflow:hidden;padding:3px;font-size:12px}
+  .mo .d.out{background:#f9fafb;color:#9ca3af}
+  .mo .d.today .n{background:var(--brand);color:#fff;border-radius:10px}
+  .mo .d.hol{background:#fff1f2}
+  .mo .n{display:inline-block;padding:0 5px;font-weight:600;font-size:13px}
+  .mo .dot{display:block;cursor:pointer;border-radius:3px;padding:1px 3px;margin-top:2px;color:#fff;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mo .more{color:var(--muted);font-size:11px}
+  .mo .lvn{font-size:11px;color:#64748b}
+  /* fab */
+  .fab{position:fixed;right:16px;bottom:20px;z-index:30;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .fab .main{width:56px;height:56px;border-radius:50%;background:var(--brand);color:#fff;font-size:30px;border:none;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+  .fab .mini{background:#fff;border:1px solid var(--line);border-radius:20px;padding:8px 14px;font-size:15px;font-family:inherit;box-shadow:0 2px 6px rgba(0,0,0,.12);display:none}
+  .fab.open .mini{display:block}
+  .fab.noadmin .adm{display:none!important}
+  /* modal */
+  .ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;display:none;align-items:center;justify-content:center;padding:16px}
+  .ov.on{display:flex}
+  .sheet{background:#fff;width:min(92vw,440px);max-height:85vh;overflow-y:auto;border-radius:16px;padding:14px 14px 18px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+  .sheet h3{margin:0 0 10px;font-size:19px}
+  label{display:block;font-size:15px;color:var(--muted);margin:10px 0 3px}
+  input,select,textarea{width:100%;min-width:0;max-width:100%;border:1px solid #d1d5db;border-radius:8px;padding:9px 10px;font-size:17px;font-family:inherit;background:#fff}
+  textarea{min-height:70px}
+  .g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+  .cbs{display:flex;flex-wrap:wrap;gap:6px}
+  .cbs label{display:flex;align-items:center;gap:5px;margin:0;border:1px solid var(--line);border-radius:16px;padding:5px 10px;color:var(--text);font-size:16px}
+  .cbs input{width:auto}
+  .thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .thumbs img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+  .thumbs a{font-size:13px}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:#111;color:#fff;padding:8px 16px;border-radius:20px;font-size:15px;z-index:60;display:none}
+  .live{display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-left:4px}
+  .live.off{background:#f59e0b}
+  #loader{position:fixed;inset:0;background:#fff;z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div id="loader"><div style="font-size:28px">🗓</div><div id="loaderTxt">กำลังโหลด...</div></div>
+
+<header>
+  <div class="top">
+    <h1><span id="coName">SGQ</span> <span style="font-weight:400;font-size:13px" data-i="appTitle">ตารางงานทีมช่าง</span><span class="live" id="live"></span></h1>
+    <div class="who" id="who"></div>
+    <button class="lang" id="langBtn" onclick="toggleLang()">မြန်မာ</button>
+  </div>
+  <div class="tabs">
+    <button data-v="day" class="on" onclick="setView('day')" data-i="day">วัน</button>
+    <button data-v="week" onclick="setView('week')" data-i="week">สัปดาห์</button>
+    <button data-v="month" onclick="setView('month')" data-i="month">เดือน</button>
+  </div>
+</header>
+<div class="nav">
+  <button onclick="nav(-1)">‹</button>
+  <div class="lbl" id="navLbl"></div>
+  <button onclick="nav(1)">›</button>
+  <button onclick="goToday()" data-i="today">วันนี้</button>
+</div>
+<div class="chips" id="chips"></div>
+<main id="main"></main>
+
+<div class="fab" id="fab">
+  <button class="mini" onclick="openExport()" data-i="export">ส่งออกสัปดาห์นี้ (PDF/Excel)</button>
+  <button class="mini adm" id="fabLeave" onclick="openLeave()" data-i="addLeave">ลงวันลา/หยุด</button>
+  <button class="mini adm" id="fabHol" onclick="openHoliday()" data-i="addHoliday">วันหยุดบริษัท</button>
+  <button class="mini adm" id="fabWorker" onclick="openWorker()" data-i="manageWorkers">เพิ่ม/แก้ช่าง</button>
+  <button class="mini adm" id="fabJob" onclick="openJob()" data-i="addJob">+ ลงงาน</button>
+  <button class="main" onclick="document.getElementById('fab').classList.toggle('open')">＋</button>
+</div>
+
+<div class="ov" id="ov" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================== i18n ================== */
+const I18N = {
+  th:{appTitle:'ตารางงานทีมช่าง',day:'วัน',week:'สัปดาห์',month:'เดือน',today:'วันนี้',myJobs:'งานของฉัน',all:'ทั้งหมด',noJobs:'ไม่มีงานลงตาราง',
+    addJob:'+ ลงงาน',editJob:'แก้ไขงาน',newJob:'ลงงานใหม่',del:'ลบ',save:'บันทึก',cancel:'ยกเลิก',close:'ปิด',start:'เริ่มงาน',finish:'งานเสร็จ',
+    attachPhoto:'แนบรูปงานเสร็จ (จำเป็น)',customer:'ลูกค้า / โครงการ',address:'ที่อยู่',map:'เปิดแผนที่',mapUrl:'ลิงก์แผนที่ (Google Maps)',jobType:'ประเภทงาน',
+    detail:'รายละเอียดงาน',startDate:'วันเริ่ม',endDate:'วันสิ้นสุด (งานหลายวัน)',startTime:'เวลาเริ่ม',dueDate:'กำหนดเสร็จ',assignees:'ช่างที่รับผิดชอบ',
+    team:'ทีม',status:'สถานะ',attachments:'ไฟล์แนบ / แบบ / รูป',leave:'ลา/หยุด',holiday:'วันหยุด',checkedIn:'เช็คอินแล้ว',notCheckedIn:'ยังไม่เช็คอิน',
+    register:'ลงทะเบียน',chooseName:'เลือกชื่อของคุณ (ครั้งเดียว)',note:'หมายเหตุ',export:'ส่งออกสัปดาห์นี้ (PDF/Excel)',useLocation:'📍 ใช้ตำแหน่งปัจจุบัน',
+    loading:'กำลังโหลด...',addLeave:'ลงวันลา/หยุด',addHoliday:'วันหยุดบริษัท',manageWorkers:'เพิ่ม/แก้ช่าง',worker:'ช่าง',dateFrom:'ตั้งแต่',dateTo:'ถึง',
+    leaveType:'ประเภท',holidayName:'ชื่อวันหยุด',date:'วันที่',confirmDel:'ยืนยันลบ?',saved:'บันทึกแล้ว',updated:'มีการอัพเดตตาราง',
+    nameTh:'ชื่อ (ไทย)',nameMm:'ชื่อ (พม่า)',role:'บทบาท',active:'ใช้งาน',exporting:'กำลังสร้างไฟล์...',openPdf:'เปิด PDF',openXlsx:'เปิด Excel',openSheet:'เปิด Google Sheet',
+    photos:'รูปงานเสร็จ',createdBy:'ลงโดย',weeklyOff:'วันหยุดประจำสัปดาห์',newWorker:'เพิ่มช่างใหม่',noAccess:'ยังไม่ได้ลงทะเบียน — เลือกชื่อของคุณ',finishNote:'หมายเหตุ (ถ้ามี)',week_of:'สัปดาห์',
+    lvTypes:['ลากิจ','ลาป่วย','หยุด','อื่นๆ'],statuses:{planned:'รอดำเนินการ',in_progress:'กำลังทำ',done:'เสร็จแล้ว',postponed:'เลื่อน',cancelled:'ยกเลิก'},
+    types:{'วัดหน้างาน':'วัดหน้างาน','ตัดประกอบ':'ตัดประกอบ','ติดตั้ง':'ติดตั้ง','แก้งาน':'แก้งาน','ส่งมอบ':'ส่งมอบ'},
+    months:['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],
+    monthsFull:['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'],
+    days:['อา.','จ.','อ.','พ.','พฤ.','ศ.','ส.'],daysFull:['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์']},
+  mm:{appTitle:'အလုပ်ဇယား',day:'နေ့',week:'အပတ်',month:'လ',today:'ဒီနေ့',myJobs:'ကျွန်ုပ်အလုပ်',all:'အားလုံး',noJobs:'အလုပ်မရှိပါ',
+    addJob:'+ အလုပ်ထည့်',editJob:'အလုပ်ပြင်',newJob:'အလုပ်အသစ်',del:'ဖျက်',save:'သိမ်း',cancel:'မလုပ်တော့',close:'ပိတ်',start:'အလုပ်စ',finish:'အလုပ်ပြီး',
+    attachPhoto:'ပြီးစီးပုံ တင်ပါ (မဖြစ်မနေ)',customer:'ဖောက်သည် / ပရောဂျက်',address:'လိပ်စာ',map:'မြေပုံဖွင့်',mapUrl:'မြေပုံလင့်',jobType:'အလုပ်အမျိုးအစား',
+    detail:'အသေးစိတ်',startDate:'စတင်ရက်',endDate:'ပြီးဆုံးရက်',startTime:'စတင်ချိန်',dueDate:'ပြီးရမည့်ရက်',assignees:'တာဝန်ခံ',
+    team:'အဖွဲ့',status:'အခြေအနေ',attachments:'ဖိုင် / ပုံစံ / ဓာတ်ပုံ',leave:'ခွင့်/နား',holiday:'ပိတ်ရက်',checkedIn:'ချက်အင်ပြီး',notCheckedIn:'ချက်အင်မလုပ်ရသေး',
+    register:'စာရင်းသွင်း',chooseName:'သင့်နာမည်ရွေးပါ (တစ်ကြိမ်သာ)',note:'မှတ်ချက်',export:'ဒီအပတ် ထုတ်ယူ (PDF/Excel)',useLocation:'📍 လက်ရှိတည်နေရာသုံး',
+    loading:'ဖွင့်နေသည်...',addLeave:'ခွင့်/နားရက် ထည့်',addHoliday:'ကုမ္ပဏီပိတ်ရက်',manageWorkers:'ဆရာများ ထည့်/ပြင်',worker:'ဆရာ',dateFrom:'မှ',dateTo:'ထိ',
+    leaveType:'အမျိုးအစား',holidayName:'ပိတ်ရက်အမည်',date:'ရက်စွဲ',confirmDel:'ဖျက်မှာသေချာလား?',saved:'သိမ်းပြီး',updated:'ဇယား အသစ်ပြောင်းပြီ',
+    nameTh:'အမည် (ထိုင်း)',nameMm:'အမည် (မြန်မာ)',role:'ရာထူး',active:'အသုံးပြု',exporting:'ဖိုင်ထုတ်နေသည်...',openPdf:'PDF ဖွင့်',openXlsx:'Excel ဖွင့်',openSheet:'Google Sheet ဖွင့်',
+    photos:'ပြီးစီးပုံများ',createdBy:'ထည့်သူ',weeklyOff:'အပတ်စဉ်ပိတ်ရက်',newWorker:'ဆရာအသစ်ထည့်',noAccess:'စာရင်းမသွင်းရသေး — သင့်နာမည်ရွေးပါ',finishNote:'မှတ်ချက် (ရှိလျှင်)',week_of:'အပတ်',
+    lvTypes:['ကိုယ်ရေးခွင့်','နာမကျန်းခွင့်','နားရက်','အခြား'],statuses:{planned:'စောင့်ဆိုင်း',in_progress:'လုပ်နေဆဲ',done:'ပြီးပြီ',postponed:'ရွှေ့',cancelled:'ပယ်ဖျက်'},
+    types:{'วัดหน้างาน':'တိုင်းတာ','ตัดประกอบ':'ဖြတ်တပ်ဆင်','ติดตั้ง':'တပ်ဆင်','แก้งาน':'ပြင်ဆင်','ส่งมอบ':'လွှဲအပ်'},
+    months:['ဇန်','ဖေ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူ','ဩဂုတ်','စက်','အောက်','နို','ဒီ'],
+    monthsFull:['ဇန်နဝါရီ','ဖေဖော်ဝါရီ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူလိုင်','ဩဂုတ်','စက်တင်ဘာ','အောက်တိုဘာ','နိုဝင်ဘာ','ဒီဇင်ဘာ'],
+    days:['နွေ','လာ','ဂါ','ဟူး','တေး','ကြာ','နေ'],daysFull:['တနင်္ဂနွေ','တနင်္လာ','အင်္ဂါ','ဗုဒ္ဓဟူး','ကြာသပတေး','သောကြာ','စနေ']}
+};
+const LS = { get:k=>{try{return localStorage.getItem(k)}catch(e){return null}}, set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}} };
+let lang = LS.get('sgq_lang') || 'th';
+const T = k => (I18N[lang][k] !== undefined ? I18N[lang][k] : I18N.th[k]);
+function applyLang(){
+  document.querySelectorAll('[data-i]').forEach(el => el.textContent = T(el.dataset.i));
+  document.getElementById('langBtn').textContent = lang === 'th' ? 'မြန်မာ' : 'ไทย';
+  document.documentElement.lang = lang;
+}
+function toggleLang(){ lang = lang === 'th' ? 'mm' : 'th'; LS.set('sgq_lang', lang); applyLang(); render(); }
+const wName = w => (lang === 'mm' && w.name_mm) ? w.name_mm : w.name_th;
+
+/* ================== state ================== */
+// หน้าแอปโฮสต์บน GitHub Pages (URL บนสุด) เพื่อให้ LIFF ล็อกอินได้ — Apps Script เป็น backend ผ่าน fetch
+const API_URL = 'https://script.google.com/macros/s/AKfycbzhVyuG_UMTLcr5GhVAdauWmd1B4k5W9ukIxLb8f3XW7UWkvkuJ-XudIBNHHCpmVBGh/exec';
+// ?nologin=1 = โหมดทดสอบไม่ผ่าน LINE (backend จะปฏิเสธถ้าตั้ง LINE_LOGIN_CHANNEL_ID ไว้)
+const LIFF_ID = /[?&]nologin=1/.test(location.search) ? '' : '2010515509-H5QemVMr';
+let S = { userId:null, displayName:'', idToken:null, user:null, isAdmin:false, workers:[], jobTypes:[], statuses:[], today:null, checkinEnabled:false,
+  view:'day', cursor:null, jobs:[], leaves:[], holidays:[], checkins:{userIds:[],names:[]}, version:0, filter:'all', loaded:{from:null,to:null} };
+
+/* ================== date helpers ================== */
+const pad = n => String(n).padStart(2,'0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const addDays = (s,n) => { const d = parse(s); d.setDate(d.getDate()+n); return ymd(d); };
+const dow = s => parse(s).getDay();
+const WEEKLY_OFF = [0];                                          // 0 = อาทิตย์ (บริษัททำงาน จ.–ส.)
+const WEEK_ORDER = [1,2,3,4,5,6,0];                              // จ. อ. พ. พฤ. ศ. ส. อา.
+const weekStart = s => addDays(s, -((dow(s)+6)%7));             // เริ่มวันจันทร์
+const isWeeklyOff = s => WEEKLY_OFF.includes(dow(s));
+const holidayOf = s => S.holidays.find(h => h.date === s) || (isWeeklyOff(s) ? { date:s, name:T('weeklyOff'), weekly:true } : null);
+const be = s => parse(s).getFullYear() + 543;
+function fmt(s, withDay){ if(!s) return ''; const d = parse(s); return (withDay ? T('days')[d.getDay()]+' ' : '') + `${d.getDate()} ${T('months')[d.getMonth()]} ${d.getFullYear()+543}`; }
+function fmtLong(s){ const d = parse(s); return `${T('daysFull')[d.getDay()]} ${d.getDate()} ${T('monthsFull')[d.getMonth()]} ${d.getFullYear()+543}`; }
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ================== API ================== */
+function call(action, payload){
+  payload = Object.assign({ userId: S.userId, displayName: S.displayName }, payload || {});
+  // เปิดจาก GitHub Pages (ไม่มี google.script.run) → ยิง fetch ไป /exec ; ใน demo.html / Apps Script ใช้ google.script.run ตามเดิม
+  if (typeof google === 'undefined' || !google.script || !google.script.run) return callFetch(action, payload);
+  return new Promise((res, rej) => {
+    var done = false;
+    var timer = setTimeout(function(){
+      if (done) return; done = true;
+      rej(new Error('เรียก "' + action + '" ไม่ตอบกลับภายใน 30 วินาที'));
+    }, 30000);
+    google.script.run
+      .withSuccessHandler(function(r){
+        if (done) return; done = true; clearTimeout(timer);
+        try { const o = JSON.parse(r); o.ok ? res(o) : rej(new Error(o.error)); }
+        catch(err){ rej(new Error('อ่านผลลัพธ์ไม่ได้: ' + String(r).substring(0,150))); }
+      })
+      .withFailureHandler(function(e){
+        if (done) return; done = true; clearTimeout(timer);
+        rej(e instanceof Error ? e : new Error(String((e && e.message) || e)));
+      })
+      .api(action, payload);
+  });
+}
+async function callFetch(action, payload){
+  const ac = new AbortController(); const timer = setTimeout(() => ac.abort(), 30000);
+  let txt;
+  try {
+    const r = await fetch(API_URL, { method:'POST', redirect:'follow', signal: ac.signal,
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },   // text/plain = ไม่มี CORS preflight
+      body: JSON.stringify({ action, payload, idToken: S.idToken }) });
+    txt = await r.text();
+  } catch(e) {
+    throw new Error(e.name === 'AbortError' ? 'เรียก "' + action + '" ไม่ตอบกลับภายใน 30 วินาที' : 'ติดต่อเซิร์ฟเวอร์ไม่ได้: ' + (e.message || e));
+  } finally { clearTimeout(timer); }
+  let o; try { o = JSON.parse(txt); } catch(e) { throw new Error('อ่านผลลัพธ์ไม่ได้: ' + String(txt).substring(0,150)); }
+  if (o.ok) return o;
+  if (o.code === 'token' && LIFF_ID && typeof liff !== 'undefined') {   // token หมดอายุ → ล็อกอินใหม่
+    try { liff.logout(); } catch(e) {}
+    liff.login(); await new Promise(() => {});
+  }
+  throw new Error(o.error);
+}
+function step(m){ const el = document.getElementById('loaderTxt'); if (el) el.textContent = m; }
+function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; setTimeout(()=>t.style.display='none', 2200); }
+
+/* ================== boot ================== */
+async function boot(){
+  try{
+    if (LIFF_ID){
+      step('1/4 เชื่อมต่อ LINE...');
+      if (typeof liff === 'undefined') throw new Error('โหลด LIFF SDK ไม่สำเร็จ (เน็ตมีปัญหา หรือถูกบล็อก)');
+      await liff.init({ liffId: LIFF_ID });
+      // ห้ามใส่ redirectUri: ใน Apps Script location.href คือ URL ของ iframe (googleusercontent)
+      // ซึ่งไม่ตรงกับ Endpoint URL ของ LIFF จะโดนปฏิเสธและได้หน้าขาว
+      if (!liff.isLoggedIn()) { step('กำลังพาไปล็อกอิน LINE...'); liff.login(); return; }
+      step('2/4 อ่านโปรไฟล์...');
+      const p = await liff.getProfile(); S.userId = p.userId; S.displayName = p.displayName;
+      S.idToken = liff.getIDToken();
+    } else {  // โหมดทดสอบ (?nologin=1)
+      S.userId = LS.get('sgq_dev_uid') || prompt('DEV: ใส่ userId ทดสอบ (เช่น admin1)') || 'dev';
+      LS.set('sgq_dev_uid', S.userId); S.displayName = 'DEV';
+    }
+    step('3/4 เชื่อมต่อฐานข้อมูล...');
+    const r = await call('init');
+    Object.assign(S, { user:r.user, isAdmin:r.isAdmin, workers:r.workers, jobTypes:r.jobTypes, statuses:r.statuses, today:r.today, checkinEnabled:r.checkinEnabled, version:r.version });
+    if (r.companyName) document.getElementById('coName').textContent = r.companyName;
+    S.cursor = S.today;
+    if (!S.isAdmin && !S.user) { S.filter = 'all'; }
+    if (S.user && !S.isAdmin) S.filter = 'me';
+    applyLang(); renderWho(); setupFab();
+    step('4/4 โหลดตารางงาน...');
+    await loadRange(true);
+    document.getElementById('loader').style.display = 'none';
+    if (!S.user && !S.isAdmin) openRegister();
+    // poll ทุก 20 วิ และหยุดเมื่อแอปอยู่เบื้องหลัง — ประหยัดโควตารันสคริปต์ (ฟรี 90 นาที/วัน)
+    setInterval(() => { if (!document.hidden) pollVersion(); }, 20000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) pollVersion(); });
+  }catch(e){
+    const inLine = /Line\//i.test(navigator.userAgent);
+    document.getElementById('loaderTxt').innerHTML =
+      '<div style="max-width:340px;text-align:left;font-size:13px;line-height:1.7;color:#334155">' +
+      '<b style="color:#dc2626">เปิดแอปไม่สำเร็จ</b><br><br>' +
+      '<b>สาเหตุ:</b> ' + esc(e.message || e) + '<br>' +
+      (e.code ? '<b>code:</b> ' + esc(e.code) + '<br>' : '') +
+      '<b>LIFF ID:</b> ' + (LIFF_ID ? esc(LIFF_ID) : '(ไม่ได้ตั้งค่า)') + '<br>' +
+      '<b>เปิดจาก:</b> ' + (inLine ? 'แอป LINE' : 'เบราว์เซอร์ปกติ') + '<br><br>' +
+      'ถ่ายหน้าจอนี้ส่งให้ผู้ดูแลระบบได้เลย</div>';
+    console.error('boot error', e);
+  }
+}
+function renderWho(){
+  const w = document.getElementById('who');
+  w.innerHTML = S.isAdmin ? `<b>ADMIN</b><br>${esc(S.displayName)}` : (S.user ? `<b>${esc(wName(S.user))}</b><br>${esc(S.user.team||'')}` : esc(S.displayName));
+}
+function setupFab(){
+  document.getElementById('fab').classList.toggle('noadmin', !S.isAdmin);
+}
+async function pollVersion(){
+  try{
+    const r = await call('version');
+    document.getElementById('live').className = 'live';
+    if (r.version !== S.version){ await loadRange(true); toast(T('updated')); }
+  }catch(e){ document.getElementById('live').className = 'live off'; }
+}
+
+/* ================== data range ================== */
+function viewRange(){
+  const c = S.cursor;
+  if (S.view === 'day') return [c, c];
+  if (S.view === 'week') { const ws = weekStart(c); return [ws, addDays(ws, 6)]; }
+  const d = parse(c); const first = ymd(new Date(d.getFullYear(), d.getMonth(), 1));
+  const gridStart = weekStart(first); return [gridStart, addDays(gridStart, 41)];
+}
+async function loadRange(force){
+  const [a,b] = viewRange();
+  const from = addDays(a,-7), to = addDays(b,7);
+  if (!force && S.loaded.from && S.loaded.from <= from && S.loaded.to >= to) { render(); return; }
+  const f = S.loaded.from && S.loaded.from < from ? S.loaded.from : from;
+  const t = S.loaded.to && S.loaded.to > to ? S.loaded.to : to;
+  const r = await call('getData', { from:f, to:t });
+  S.jobs = r.jobs; S.leaves = r.leaves; S.holidays = r.holidays; S.checkins = r.checkins; S.workers = r.workers; S.version = r.version; S.today = r.today;
+  S.loaded = { from:f, to:t };
+  render();
+}
+
+/* ================== view / nav ================== */
+function setView(v){ S.view = v; document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); loadRange(false); }
+function nav(n){
+  if (S.view === 'day') S.cursor = addDays(S.cursor, n);
+  else if (S.view === 'week') S.cursor = addDays(S.cursor, 7*n);
+  else { const d = parse(S.cursor); d.setDate(1); d.setMonth(d.getMonth()+n); S.cursor = ymd(d); }
+  loadRange(false);
+}
+function goToday(){ S.cursor = S.today; loadRange(false); }
+function gotoDay(s){ S.cursor = s; setView('day'); }
+
+/* ================== filters ================== */
+function jobsOn(dateStr){
+  return S.jobs.filter(j => j.start_date <= dateStr && j.end_date >= dateStr).filter(applyFilter)
+    .sort((a,b) => (a.start_time||'99').localeCompare(b.start_time||'99'));
+}
+function applyFilter(j){
+  const ids = (j.assignees||'').split(',').map(s=>s.trim());
+  if (S.filter === 'me') return S.user ? ids.includes(S.user.worker_id) : true;
+  if (S.filter.startsWith('team:')) return j.team === S.filter.slice(5) || ids.some(id => (S.workers.find(w=>w.worker_id===id)||{}).team === S.filter.slice(5));
+  return true;
+}
+function renderChips(){
+  const teams = [...new Set(S.workers.map(w => w.team).filter(Boolean))];
+  let h = `<button class="chip ${S.filter==='all'?'on':''}" onclick="setFilter('all')">${T('all')}</button>`;
+  if (S.user) h += `<button class="chip ${S.filter==='me'?'on':''}" onclick="setFilter('me')">${T('myJobs')}</button>`;
+  teams.forEach(t => h += `<button class="chip ${S.filter==='team:'+t?'on':''}" onclick="setFilter('team:${esc(t)}')">${esc(t)}</button>`);
+  document.getElementById('chips').innerHTML = h;
+}
+function setFilter(f){ S.filter = f; render(); }
+
+/* ================== render ================== */
+function fixNavTop(){ const h = document.querySelector('header'), n = document.querySelector('.nav'); if (h && n) n.style.top = h.offsetHeight + 'px'; }
+window.addEventListener('resize', fixNavTop);
+function render(){
+  fixNavTop(); renderChips();
+  const lbl = document.getElementById('navLbl');
+  const m = document.getElementById('main');
+  if (S.view === 'day'){ lbl.textContent = fmtLong(S.cursor); m.innerHTML = renderDay(S.cursor); }
+  else if (S.view === 'week'){ const ws = weekStart(S.cursor); lbl.textContent = `${fmt(ws)} – ${fmt(addDays(ws,6))}`; m.innerHTML = renderWeek(ws); }
+  else { const d = parse(S.cursor); lbl.textContent = `${T('monthsFull')[d.getMonth()]} ${d.getFullYear()+543}`; m.innerHTML = renderMonth(d); }
+}
+const worker = id => S.workers.find(w => w.worker_id === id);
+const typeColor = t => `var(--t-${t}, #475569)`;
+function checkinState(w){
+  // ok=false = ต่อระบบเช็คอินไม่ได้ → ไม่แสดงสัญลักษณ์เลย (ไม่ให้ ⏳ ทุกคนจนเข้าใจผิด)
+  if (!S.checkinEnabled || !S.checkins || !S.checkins.ok) return '';
+  const ok = (S.checkins.workerIds || []).includes(w.worker_id) ||
+    (w.line_user_id && S.checkins.userIds.includes(w.line_user_id)) || S.checkins.names.includes(w.name_th);
+  return ok ? 'ci' : 'nci';
+}
+function peopleHtml(ids, showCheckin){
+  return `<div class="ppl">` + ids.split(',').map(s=>s.trim()).filter(Boolean).map(id => {
+    const w = worker(id); if (!w) return `<span>${esc(id)}</span>`;
+    const cs = showCheckin ? checkinState(w) : '';
+    const me = S.user && S.user.worker_id === id ? ' me' : '';
+    return `<span class="${cs}${me}" title="${cs==='ci'?T('checkedIn'):cs==='nci'?T('notCheckedIn'):''}">${cs==='ci'?'✅ ':cs==='nci'?'⏳ ':''}${esc(wName(w))}</span>`;
+  }).join('') + `</div>`;
+}
+function renderDay(ds){
+  const hol = holidayOf(ds);
+  const jobs = jobsOn(ds);
+  const leaves = S.leaves.filter(l => l.date_from <= ds && l.date_to >= ds);
+  const isToday = ds === S.today;
+  let h = '';
+  if (hol) h += `<div class="banner">🎌 ${T('holiday')}: ${esc(hol.name)}</div>`;
+  if (leaves.length) h += `<div class="leaveline">🏖 ${T('leave')}: ` + leaves.map(l => { const w = worker(l.worker_id); return `${esc(w?wName(w):l.worker_id)} (${esc(l.type)})` + (S.isAdmin ? ` <a href="#" onclick="delLeave('${l.leave_id}');return false;">✕</a>` : ''); }).join(', ') + `</div>`;
+  if (!jobs.length) h += `<div class="empty">${T('noJobs')}</div>`;
+  jobs.forEach(j => h += jobCard(j, isToday));
+  return h;
+}
+function jobCard(j, showCheckin){
+  const multi = j.start_date !== j.end_date;
+  const canWork = S.user && (j.assignees||'').split(',').map(s=>s.trim()).includes(S.user.worker_id);
+  let acts = '';
+  if ((canWork || S.isAdmin) && j.status === 'planned') acts += `<button class="btn w sm" onclick="setStatus('${j.job_id}','in_progress')">🔧 ${T('start')}</button>`;
+  if ((canWork || S.isAdmin) && ['planned','in_progress'].includes(j.status)) acts += `<button class="btn g sm" onclick="openFinish('${j.job_id}')">✅ ${T('finish')}</button>`;
+  if (S.isAdmin) acts += `<button class="btn sm" onclick="openJob('${j.job_id}')">✏️</button><button class="btn d sm" onclick="delJob('${j.job_id}')">🗑</button>`;
+  const photos = (j.done_photos||'').split('|').filter(Boolean);
+  const atts = (j.attachments||'').split('|').filter(Boolean);
+  return `<div class="card ${j.status==='done'?'done':''}">
+    <div class="row"><span class="badge" style="background:${typeColor(j.job_type)}">${esc(T('types')[j.job_type]||j.job_type)}</span>
+      ${j.start_time?`<b>⏱ ${esc(j.start_time)}</b>`:''}<span style="flex:1"></span>
+      <span class="st" style="background:var(--${j.status})">${esc(T('statuses')[j.status]||j.status)}</span></div>
+    <div class="title">${esc(j.customer)}</div>
+    <div class="meta">
+      ${multi?`📅 ${fmt(j.start_date)} – ${fmt(j.end_date)}<br>`:''}
+      ${j.due_date?`⏰ ${T('dueDate')} ${fmt(j.due_date)}<br>`:''}
+      ${j.address?`📍 ${esc(j.address)} `:''}${j.map_url?`<a href="${esc(j.map_url)}" target="_blank" rel="noopener">🗺 ${T('map')}</a>`:''}
+      ${j.detail?`<br>📝 ${esc(j.detail).replace(/\n/g,'<br>')}`:''}
+      ${j.note?`<br>💬 ${esc(j.note)}`:''}
+      ${j.team?`<br>👥 ${esc(j.team)}`:''}
+    </div>
+    ${peopleHtml(j.assignees, showCheckin)}
+    ${atts.length?`<div class="thumbs">${atts.map((u,i)=>/\.(jpe?g|png|gif|webp)|uc\?export|drive\.google\.com\/thumbnail/i.test(u)?`<a href="${esc(u)}" target="_blank"><img src="${esc(u)}"></a>`:`<a href="${esc(u)}" target="_blank">📎 ${T('attachments')} ${i+1}</a>`).join('')}</div>`:''}
+    ${photos.length?`<div class="meta" style="margin-top:6px">${T('photos')}</div><div class="thumbs">${photos.map(u=>`<a href="${esc(u)}" target="_blank"><img src="${esc(u)}"></a>`).join('')}</div>`:''}
+    ${acts?`<div class="acts">${acts}</div>`:''}
+  </div>`;
+}
+function renderWeek(ws){
+  const days = []; for (let i=0;i<7;i++) days.push(addDays(ws,i));
+  let h = `<div class="wk"><table class="wk-t"><tr><th>${T('worker')}</th>`;
+  days.forEach(d => { const hol = holidayOf(d); h += `<th class="${d===S.today?'today':''} ${hol?'hol':''}" onclick="gotoDay('${d}')">${fmt(d,true)}${hol?`<br><small>🎌 ${esc(hol.name)}</small>`:''}</th>`; });
+  h += '</tr>';
+  const ws_ = S.workers.filter(w => S.filter==='me' ? (S.user && w.worker_id===S.user.worker_id) : S.filter.startsWith('team:') ? w.team===S.filter.slice(5) : true);
+  ws_.forEach(w => {
+    h += `<tr><td>${esc(wName(w))}<br><small style="color:#64748b">${esc(w.team||'')}</small></td>`;
+    days.forEach(d => {
+      const hol = holidayOf(d);
+      let c = '';
+      S.leaves.filter(l => l.worker_id===w.worker_id && l.date_from<=d && l.date_to>=d).forEach(l => c += `<span class="cell-chip lv">🏖 ${esc(l.type)}</span>`);
+      S.jobs.filter(j => j.start_date<=d && j.end_date>=d && (j.assignees||'').split(',').map(s=>s.trim()).includes(w.worker_id) && j.status!=='cancelled')
+        .sort((a,b)=>(a.start_time||'99').localeCompare(b.start_time||'99'))
+        .forEach(j => c += `<span class="cell-chip ${j.status==='done'?'done':''}" style="background:${typeColor(j.job_type)}" onclick="openDetail('${j.job_id}')">${j.start_time?j.start_time+' ':''}${esc(j.customer)}</span>`);
+      h += `<td class="${d===S.today?'today':''} ${hol?'hol':''}">${c}</td>`;
+    });
+    h += '</tr>';
+  });
+  // งานที่ยังไม่ได้มอบหมายคน
+  const un = days.map(d => S.jobs.filter(j => j.start_date<=d && j.end_date>=d && !(j.assignees||'').trim() && j.status!=='cancelled'));
+  if (un.some(a=>a.length)){
+    h += `<tr><td>❓</td>` + un.map((a,i)=>`<td class="${days[i]===S.today?'today':''}">${a.map(j=>`<span class="cell-chip" style="background:${typeColor(j.job_type)}" onclick="openDetail('${j.job_id}')">${esc(j.customer)}</span>`).join('')}</td>`).join('') + '</tr>';
+  }
+  return h + '</table></div>';
+}
+function renderMonth(d){
+  const first = ymd(new Date(d.getFullYear(), d.getMonth(), 1));
+  const gs = weekStart(first);
+  let h = `<div class="mo">` + WEEK_ORDER.map(i=>`<div class="h">${T('days')[i]}</div>`).join('');
+  for (let i=0;i<42;i++){
+    const ds = addDays(gs,i); const dd = parse(ds);
+    const out = dd.getMonth() !== d.getMonth();
+    const hol = holidayOf(ds);
+    const jobs = jobsOn(ds).filter(j=>j.status!=='cancelled');
+    const lv = S.leaves.filter(l => l.date_from<=ds && l.date_to>=ds);
+    let c = `<div class="d ${out?'out':''} ${ds===S.today?'today':''} ${hol?'hol':''}" onclick="gotoDay('${ds}')"><span class="n">${dd.getDate()}</span>`;
+    if (hol && !hol.weekly) c += `<span class="dot" style="background:#e11d48">🎌 ${esc(hol.name)}</span>`;
+    jobs.slice(0,3).forEach(j => c += `<span class="dot" style="background:${typeColor(j.job_type)};${j.status==='done'?'opacity:.5':''}" onclick="event.stopPropagation();openDetail('${j.job_id}')">${esc(j.customer)}</span>`);
+    if (jobs.length>3) c += `<span class="more">+${jobs.length-3}</span>`;
+    if (lv.length) c += `<div class="lvn">🏖 ${lv.length}</div>`;
+    h += c + '</div>';
+  }
+  return h + '</div>';
+}
+
+/* ================== modals ================== */
+const ov = () => document.getElementById('ov');
+function openModal(html){ document.getElementById('sheet').innerHTML = html; ov().classList.add('on'); document.getElementById('fab').classList.remove('open'); }
+function closeModal(){ ov().classList.remove('on'); }
+
+function openRegister(){
+  openModal(`<h3>${T('register')}</h3><div class="meta">${T('noAccess')}</div>
+    <label>${T('chooseName')}</label><select id="regW">${S.workers.filter(w=>!w.line_user_id).map(w=>`<option value="${w.worker_id}">${esc(w.name_th)}${w.name_mm?' / '+esc(w.name_mm):''}</option>`).join('')}</select>
+    <div class="acts"><button class="btn p" onclick="doRegister()">${T('save')}</button></div>`);
+}
+async function doRegister(){
+  try{ const r = await call('register',{ workerId: document.getElementById('regW').value }); S.user = r.user; S.filter='me'; renderWho(); closeModal(); await loadRange(true); toast(T('saved')); }
+  catch(e){ alert(e.message); }
+}
+
+function openDetail(id){
+  const j = S.jobs.find(x=>x.job_id===id); if(!j) return;
+  openModal(`<h3>${esc(j.customer)}</h3>${jobCard(j, j.start_date<=S.today && j.end_date>=S.today)}<div class="acts"><button class="btn" onclick="closeModal()">${T('close')}</button></div>`);
+}
+
+let jobAtt = [];
+function openJob(id){
+  const j = id ? S.jobs.find(x=>x.job_id===id) : { start_date:S.cursor, end_date:S.cursor, due_date:S.cursor, job_type:S.jobTypes[0], status:'planned', assignees:'' };
+  jobAtt = (j.attachments||'').split('|').filter(Boolean);
+  const ids = (j.assignees||'').split(',').map(s=>s.trim());
+  openModal(`<h3>${id?T('editJob'):T('newJob')}</h3>
+    <input type="hidden" id="f_id" value="${esc(j.job_id||'')}">
+    <label>${T('jobType')}</label><select id="f_type">${S.jobTypes.map(t=>`<option ${t===j.job_type?'selected':''} value="${t}">${esc(T('types')[t]||t)}</option>`).join('')}</select>
+    <label>${T('customer')} *</label><input id="f_customer" value="${esc(j.customer||'')}">
+    <div class="g2"><div><label>${T('startDate')} *</label><input type="date" id="f_start" value="${j.start_date}" onchange="syncDates(this.value)"></div><div><label>${T('endDate')}</label><input type="date" id="f_end" value="${j.end_date||j.start_date}"></div></div>
+    <div class="g2"><div><label>${T('startTime')}</label><input type="time" id="f_time" value="${esc(j.start_time||'')}"></div><div><label>${T('dueDate')}</label><input type="date" id="f_due" value="${esc(j.due_date||'')}"></div></div>
+    <label>${T('assignees')}</label><div class="cbs">${S.workers.map(w=>`<label><input type="checkbox" class="f_as" value="${w.worker_id}" ${ids.includes(w.worker_id)?'checked':''}>${esc(wName(w))}</label>`).join('')}</div>
+    <label>${T('team')}</label><select id="f_team"><option value="">-</option>${[...new Set(S.workers.map(w=>w.team).filter(Boolean))].map(t=>`<option ${t===j.team?'selected':''}>${esc(t)}</option>`).join('')}</select>
+    <label>${T('address')}</label><textarea id="f_addr">${esc(j.address||'')}</textarea>
+    <label>${T('mapUrl')}</label><input id="f_map" value="${esc(j.map_url||'')}" placeholder="https://maps.app.goo.gl/...">
+    <input type="hidden" id="f_lat" value="${esc(j.lat||'')}"><input type="hidden" id="f_lng" value="${esc(j.lng||'')}">
+    <div class="acts"><button class="btn sm" onclick="useLocation()">${T('useLocation')}</button></div>
+    <label>${T('detail')}</label><textarea id="f_detail">${esc(j.detail||'')}</textarea>
+    ${id?`<label>${T('status')}</label><select id="f_status">${S.statuses.map(s=>`<option value="${s}" ${s===j.status?'selected':''}>${esc(T('statuses')[s])}</option>`).join('')}</select>`:''}
+    <label>${T('attachments')}</label><input type="file" id="f_files" multiple accept="image/*,.pdf" onchange="addAttachments(this)">
+    <div class="thumbs" id="f_thumbs">${attThumbs()}</div>
+    <div class="acts"><button class="btn p" id="f_save" onclick="saveJob()">${T('save')}</button><button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+}
+function attThumbs(){ return jobAtt.map((u,i)=>`<span>${/uc\?export|drive\.google\.com\/thumbnail|\.(jpe?g|png|webp)/i.test(u)?`<img src="${esc(u)}">`:'📎'}<br><a href="#" onclick="jobAtt.splice(${i},1);document.getElementById('f_thumbs').innerHTML=attThumbs();return false;">✕</a></span>`).join(''); }
+async function addAttachments(inp){
+  for (const f of inp.files){
+    try{
+      const data = f.type.startsWith('image/') ? await shrink(f) : await toB64(f);
+      const r = await call('uploadFile', { name:f.name, data, mime: f.type.startsWith('image/')?'image/jpeg':f.type });
+      jobAtt.push(r.url);
+    }catch(e){ alert(e.message); }
+  }
+  inp.value=''; document.getElementById('f_thumbs').innerHTML = attThumbs();
+}
+function useLocation(){
+  if (!navigator.geolocation) return alert('no geolocation');
+  navigator.geolocation.getCurrentPosition(p => {
+    const la = p.coords.latitude.toFixed(6), ln = p.coords.longitude.toFixed(6);
+    document.getElementById('f_lat').value = la; document.getElementById('f_lng').value = ln;
+    document.getElementById('f_map').value = `https://maps.google.com/?q=${la},${ln}`;
+    toast('📍 OK');
+  }, e => alert(e.message), { enableHighAccuracy:true, timeout:10000 });
+}
+function syncDates(v){ if(!v) return; document.getElementById('f_end').value = v; document.getElementById('f_due').value = v; }
+async function saveJob(){
+  const g = id => document.getElementById(id);
+  const job = { job_id:g('f_id').value, job_type:g('f_type').value, customer:g('f_customer').value.trim(), start_date:g('f_start').value, end_date:g('f_end').value||g('f_start').value,
+    start_time:g('f_time').value, due_date:g('f_due').value, assignees:[...document.querySelectorAll('.f_as:checked')].map(c=>c.value), team:g('f_team').value,
+    address:g('f_addr').value.trim(), map_url:g('f_map').value.trim(), lat:g('f_lat').value, lng:g('f_lng').value, detail:g('f_detail').value.trim(),
+    status: g('f_status') ? g('f_status').value : 'planned', attachments: jobAtt };
+  if (!job.customer || !job.start_date) return alert(T('customer') + ' / ' + T('startDate'));
+  if (job.end_date < job.start_date) job.end_date = job.start_date;
+  g('f_save').disabled = true;
+  try{ await call('saveJob', { job, isNew: !job.job_id }); closeModal(); await loadRange(true); toast(T('saved')); }
+  catch(e){ alert(e.message); g('f_save').disabled = false; }
+}
+async function delJob(id){ if(!confirm(T('confirmDel'))) return; try{ await call('deleteJob',{jobId:id}); closeModal(); await loadRange(true); }catch(e){ alert(e.message); } }
+async function setStatus(id, st){ try{ await call('setStatus',{jobId:id,status:st}); await loadRange(true); toast(T('saved')); }catch(e){ alert(e.message); } }
+
+let finPhotos = [];
+function openFinish(id){
+  finPhotos = [];
+  openModal(`<h3>✅ ${T('finish')}</h3><input type="hidden" id="fin_id" value="${id}">
+    <label>${T('attachPhoto')}</label><input type="file" accept="image/*" capture="environment" multiple onchange="addFinPhotos(this)">
+    <div class="thumbs" id="fin_thumbs"></div>
+    <label>${T('finishNote')}</label><textarea id="fin_note"></textarea>
+    <div class="acts"><button class="btn g" id="fin_save" onclick="doFinish()">${T('save')}</button><button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+}
+async function addFinPhotos(inp){
+  for (const f of inp.files) finPhotos.push(await shrink(f));
+  inp.value=''; document.getElementById('fin_thumbs').innerHTML = finPhotos.map(d=>`<img src="${d}">`).join('');
+}
+async function doFinish(){
+  if (!finPhotos.length && !S.isAdmin) return alert(T('attachPhoto'));
+  const b = document.getElementById('fin_save'); b.disabled = true;
+  try{ await call('setStatus',{ jobId:document.getElementById('fin_id').value, status:'done', photos: finPhotos.map(d=>({data:d,mime:'image/jpeg'})), note:document.getElementById('fin_note').value.trim() }); closeModal(); await loadRange(true); toast(T('saved')); }
+  catch(e){ alert(e.message); b.disabled=false; }
+}
+
+function openLeave(){
+  openModal(`<h3>${T('addLeave')}</h3>
+    <label>${T('worker')}</label><select id="lv_w">${S.workers.map(w=>`<option value="${w.worker_id}">${esc(wName(w))}</option>`).join('')}</select>
+    <div class="g2"><div><label>${T('dateFrom')}</label><input type="date" id="lv_from" value="${S.cursor}"></div><div><label>${T('dateTo')}</label><input type="date" id="lv_to" value="${S.cursor}"></div></div>
+    <label>${T('leaveType')}</label><select id="lv_type">${T('lvTypes').map((t,i)=>`<option value="${I18N.th.lvTypes[i]}">${t}</option>`).join('')}</select>
+    <label>${T('note')}</label><input id="lv_note">
+    <div class="acts"><button class="btn p" onclick="saveLeave()">${T('save')}</button><button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+}
+async function saveLeave(){
+  const g = id => document.getElementById(id).value;
+  try{ await call('saveLeave',{ leave:{ worker_id:g('lv_w'), date_from:g('lv_from'), date_to:g('lv_to')||g('lv_from'), type:g('lv_type'), note:g('lv_note') } }); closeModal(); await loadRange(true); toast(T('saved')); }catch(e){ alert(e.message); }
+}
+async function delLeave(id){ if(!confirm(T('confirmDel'))) return; try{ await call('deleteLeave',{leaveId:id}); await loadRange(true); }catch(e){ alert(e.message); } }
+
+function openHoliday(){
+  const cur = S.holidays.find(h=>h.date===S.cursor);
+  openModal(`<h3>${T('addHoliday')}</h3>
+    <label>${T('date')}</label><input type="date" id="h_date" value="${S.cursor}">
+    <label>${T('holidayName')}</label><input id="h_name" value="${esc(cur?cur.name:'')}">
+    <div class="acts"><button class="btn p" onclick="saveHoliday()">${T('save')}</button>${cur?`<button class="btn d" onclick="delHoliday()">${T('del')}</button>`:''}<button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+}
+async function saveHoliday(){ try{ await call('saveHoliday',{ date:document.getElementById('h_date').value, name:document.getElementById('h_name').value }); closeModal(); await loadRange(true); }catch(e){ alert(e.message); } }
+async function delHoliday(){ try{ await call('deleteHoliday',{ date:document.getElementById('h_date').value }); closeModal(); await loadRange(true); }catch(e){ alert(e.message); } }
+
+function openWorker(){
+  openModal(`<h3>${T('manageWorkers')}</h3>
+    <label>${T('worker')}</label><select id="w_sel" onchange="fillWorker()"><option value="">+ ${T('newWorker')}</option>${S.workers.map(w=>`<option value="${w.worker_id}">${esc(w.name_th)}</option>`).join('')}</select>
+    <label>${T('nameTh')}</label><input id="w_th"><label>${T('nameMm')}</label><input id="w_mm">
+    <label>${T('team')}</label><input id="w_team" list="teams"><datalist id="teams">${[...new Set(S.workers.map(w=>w.team).filter(Boolean))].map(t=>`<option value="${esc(t)}">`).join('')}</datalist>
+    <label>${T('role')}</label><select id="w_role"><option value="worker">worker</option><option value="lead">lead</option></select>
+    <label><input type="checkbox" id="w_active" checked style="width:auto"> ${T('active')}</label>
+    <div class="acts"><button class="btn p" onclick="saveWorker()">${T('save')}</button><button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+}
+function fillWorker(){
+  const w = worker(document.getElementById('w_sel').value) || {};
+  document.getElementById('w_th').value = w.name_th||''; document.getElementById('w_mm').value = w.name_mm||'';
+  document.getElementById('w_team').value = w.team||''; document.getElementById('w_role').value = w.role||'worker'; document.getElementById('w_active').checked = w.active!=='FALSE';
+}
+async function saveWorker(){
+  const g = id => document.getElementById(id);
+  const id = g('w_sel').value; const old = worker(id) || {};
+  const w = { worker_id:id, name_th:g('w_th').value.trim(), name_mm:g('w_mm').value.trim(), team:g('w_team').value.trim(), role:g('w_role').value, line_user_id: old.line_user_id||'', active: g('w_active').checked };
+  if (!w.name_th) return;
+  try{ const r = await call('saveWorker',{worker:w}); S.workers = r.workers; closeModal(); render(); toast(T('saved')); }catch(e){ alert(e.message); }
+}
+
+async function openExport(){
+  const ws = weekStart(S.cursor);
+  openModal(`<h3>${T('export')}</h3><div class="meta">${T('week_of')} ${fmt(ws)} – ${fmt(addDays(ws,6))}</div><div id="ex_body" class="empty">${T('exporting')}</div>`);
+  try{
+    const r = await call('exportWeek',{ weekStart: ws });
+    document.getElementById('ex_body').innerHTML = `<div class="acts" style="justify-content:center">
+      <a class="btn p" href="${r.pdfUrl}" target="_blank">📄 ${T('openPdf')}</a><a class="btn g" href="${r.xlsxUrl}" target="_blank">📊 ${T('openXlsx')}</a><a class="btn" href="${r.sheetUrl}" target="_blank">${T('openSheet')}</a></div>`;
+  }catch(e){ document.getElementById('ex_body').textContent = e.message; }
+}
+
+/* ================== image helpers ================== */
+function toB64(file){ return new Promise((res,rej)=>{ const r = new FileReader(); r.onload = ()=>res(r.result); r.onerror = rej; r.readAsDataURL(file); }); }
+function shrink(file, max=1280, q=0.75){
+  return new Promise((res,rej)=>{
+    const img = new Image(); const url = URL.createObjectURL(file);
+    img.onload = () => { const s = Math.min(1, max/Math.max(img.width,img.height)); const c = document.createElement('canvas');
+      c.width = Math.round(img.width*s); c.height = Math.round(img.height*s); c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', q)); };
+    img.onerror = rej; img.src = url;
+  });
+}
+boot();
+</script>
+</body>
+</html>
