@@ -143,7 +143,7 @@ const I18N = {
     team:'ทีม',status:'สถานะ',attachments:'ไฟล์แนบ / แบบ / รูป',leave:'ลา/หยุด',holiday:'วันหยุด',checkedIn:'เช็คอินแล้ว',notCheckedIn:'ยังไม่เช็คอิน',
     register:'ลงทะเบียน',chooseName:'เลือกชื่อของคุณ (ครั้งเดียว)',note:'หมายเหตุ',export:'ส่งออกสัปดาห์นี้ (PDF/Excel)',useLocation:'📍 ใช้ตำแหน่งปัจจุบัน',
     loading:'กำลังโหลด...',addLeave:'ลงวันลา/หยุด',addHoliday:'วันหยุดบริษัท',manageWorkers:'เพิ่ม/แก้ช่าง',worker:'ช่าง',dateFrom:'ตั้งแต่',dateTo:'ถึง',
-    leaveType:'ประเภท',holidayName:'ชื่อวันหยุด',date:'วันที่',confirmDel:'ยืนยันลบ?',saved:'บันทึกแล้ว',updated:'มีการอัพเดตตาราง',
+    leaveType:'ประเภท',holidayName:'ชื่อวันหยุด',date:'วันที่',confirmDel:'ยืนยันลบ?',saved:'บันทึกแล้ว',updated:'มีการอัพเดตตาราง',refreshing:'กำลังอัพเดตข้อมูล...',refreshFail:'อัพเดตไม่ได้:',
     nameTh:'ชื่อ (ไทย)',nameMm:'ชื่อ (พม่า)',role:'บทบาท',active:'ใช้งาน',exporting:'กำลังสร้างไฟล์...',openPdf:'เปิด PDF',openXlsx:'เปิด Excel',openSheet:'เปิด Google Sheet',
     photos:'รูปงานเสร็จ',createdBy:'ลงโดย',weeklyOff:'วันหยุดประจำสัปดาห์',newWorker:'เพิ่มช่างใหม่',noAccess:'ยังไม่ได้ลงทะเบียน — เลือกชื่อของคุณ',finishNote:'หมายเหตุ (ถ้ามี)',week_of:'สัปดาห์',
     lvTypes:['ลากิจ','ลาป่วย','หยุด','อื่นๆ'],statuses:{planned:'รอดำเนินการ',in_progress:'กำลังทำ',done:'เสร็จแล้ว',postponed:'เลื่อน',cancelled:'ยกเลิก'},
@@ -158,7 +158,7 @@ const I18N = {
     team:'အဖွဲ့',status:'အခြေအနေ',attachments:'ဖိုင် / ပုံစံ / ဓာတ်ပုံ',leave:'ခွင့်/နား',holiday:'ပိတ်ရက်',checkedIn:'ချက်အင်ပြီး',notCheckedIn:'ချက်အင်မလုပ်ရသေး',
     register:'စာရင်းသွင်း',chooseName:'သင့်နာမည်ရွေးပါ (တစ်ကြိမ်သာ)',note:'မှတ်ချက်',export:'ဒီအပတ် ထုတ်ယူ (PDF/Excel)',useLocation:'📍 လက်ရှိတည်နေရာသုံး',
     loading:'ဖွင့်နေသည်...',addLeave:'ခွင့်/နားရက် ထည့်',addHoliday:'ကုမ္ပဏီပိတ်ရက်',manageWorkers:'ဆရာများ ထည့်/ပြင်',worker:'ဆရာ',dateFrom:'မှ',dateTo:'ထိ',
-    leaveType:'အမျိုးအစား',holidayName:'ပိတ်ရက်အမည်',date:'ရက်စွဲ',confirmDel:'ဖျက်မှာသေချာလား?',saved:'သိမ်းပြီး',updated:'ဇယား အသစ်ပြောင်းပြီ',
+    leaveType:'အမျိုးအစား',holidayName:'ပိတ်ရက်အမည်',date:'ရက်စွဲ',confirmDel:'ဖျက်မှာသေချာလား?',saved:'သိမ်းပြီး',updated:'ဇယား အသစ်ပြောင်းပြီ',refreshing:'အချက်အလက် အသစ်ပြောင်းနေသည်...',refreshFail:'အသစ်ပြောင်း၍မရပါ:',
     nameTh:'အမည် (ထိုင်း)',nameMm:'အမည် (မြန်မာ)',role:'ရာထူး',active:'အသုံးပြု',exporting:'ဖိုင်ထုတ်နေသည်...',openPdf:'PDF ဖွင့်',openXlsx:'Excel ဖွင့်',openSheet:'Google Sheet ဖွင့်',
     photos:'ပြီးစီးပုံများ',createdBy:'ထည့်သူ',weeklyOff:'အပတ်စဉ်ပိတ်ရက်',newWorker:'ဆရာအသစ်ထည့်',noAccess:'စာရင်းမသွင်းရသေး — သင့်နာမည်ရွေးပါ',finishNote:'မှတ်ချက် (ရှိလျှင်)',week_of:'အပတ်',
     lvTypes:['ကိုယ်ရေးခွင့်','နာမကျန်းခွင့်','နားရက်','အခြား'],statuses:{planned:'စောင့်ဆိုင်း',in_progress:'လုပ်နေဆဲ',done:'ပြီးပြီ',postponed:'ရွှေ့',cancelled:'ပယ်ဖျက်'},
@@ -274,17 +274,25 @@ async function boot(){
       LS.set('sgq_dev_uid', S.userId); S.displayName = 'DEV';
     }
     step('3/4 เชื่อมต่อฐานข้อมูล...');
-    const r = await call('init');
-    Object.assign(S, { user:r.user, isAdmin:r.isAdmin, workers:r.workers, jobTypes:r.jobTypes, statuses:r.statuses, today:r.today, checkinEnabled:r.checkinEnabled, version:r.version });
-    if (r.companyName) document.getElementById('coName').textContent = r.companyName;
-    S.cursor = S.today;
-    if (!S.isAdmin && !S.user) { S.filter = 'all'; }
-    if (S.user && !S.isAdmin) S.filter = 'me';
-    applyLang(); renderWho(); setupFab();
-    step('4/4 โหลดตารางงาน...');
-    await loadRange(true);
+    // แสดงตารางครั้งล่าสุดจากเครื่องทันที (ถ้ามี) ระหว่างรอ Apps Script — แล้วค่อยอัพเดตเงียบ ๆ
+    S.today = S.cursor = ymd(new Date());
+    const cached = loadCache();
+    if (cached) { applyState(cached); S.today = S.cursor = ymd(new Date()); render(); document.getElementById('loader').style.display = 'none'; toast(T('refreshing')); }
+    // init รอบเดียวพร้อมข้อมูลช่วงที่กำลังดู (แทน init + getData 2 รอบ)
+    const [a0, b0] = viewRange(); const f0 = addDays(a0, -7), t0 = addDays(b0, 7);
+    let r;
+    try { r = await call('init', { from: f0, to: t0 }); }
+    catch(e) { if (!cached) throw e; toast(T('refreshFail') + ' ' + (e.message || e)); r = null; }
+    if (r) {
+      applyState({ user:r.user, isAdmin:r.isAdmin, workers:r.workers, jobTypes:r.jobTypes, statuses:r.statuses, today:r.today, checkinEnabled:r.checkinEnabled, version:r.version, companyName:r.companyName,
+        jobs:r.jobs, leaves:r.leaves, holidays:r.holidays, checkins:r.checkins, loaded: r.jobs ? { from:f0, to:t0 } : { from:null, to:null } });
+      if (!cached) S.cursor = S.today;
+      if (!r.jobs) { step('4/4 โหลดตารางงาน...'); await loadRange(true); }   // backend/mock รุ่นเก่าไม่คืนข้อมูลใน init
+      saveCache();
+      render();
+    }
     document.getElementById('loader').style.display = 'none';
-    if (!S.user && !S.isAdmin) openRegister();
+    if (r && !S.user && !S.isAdmin) openRegister();
     // poll ทุก 20 วิ และหยุดเมื่อแอปอยู่เบื้องหลัง — ประหยัดโควตารันสคริปต์ (ฟรี 90 นาที/วัน)
     setInterval(() => { if (!document.hidden) pollVersion(); }, 20000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) pollVersion(); });
@@ -300,6 +308,28 @@ async function boot(){
       'ถ่ายหน้าจอนี้ส่งให้ผู้ดูแลระบบได้เลย</div>';
     console.error('boot error', e);
   }
+}
+function applyState(o){
+  Object.assign(S, { user:o.user, isAdmin:o.isAdmin, workers:o.workers, jobTypes:o.jobTypes, statuses:o.statuses, today:o.today, checkinEnabled:o.checkinEnabled, version:o.version,
+    jobs:o.jobs || [], leaves:o.leaves || [], holidays:o.holidays || [], checkins:o.checkins || {userIds:[],names:[]}, loaded:o.loaded || {from:null,to:null} });
+  if (o.companyName) document.getElementById('coName').textContent = o.companyName;
+  if (!S.isAdmin && !S.user) S.filter = 'all';
+  if (S.user && !S.isAdmin) S.filter = 'me';
+  applyLang(); renderWho(); setupFab();
+}
+const CACHE_KEY = 'sgq_cache_v1';
+function saveCache(){
+  try { LS.set(CACHE_KEY, JSON.stringify({ uid:S.userId, at:Date.now(), user:S.user, isAdmin:S.isAdmin, workers:S.workers, jobTypes:S.jobTypes, statuses:S.statuses,
+    today:S.today, checkinEnabled:S.checkinEnabled, version:S.version, companyName:document.getElementById('coName').textContent,
+    jobs:S.jobs, leaves:S.leaves, holidays:S.holidays, checkins:S.checkins, loaded:S.loaded })); } catch(e) {}
+}
+function loadCache(){
+  try {
+    const o = JSON.parse(LS.get(CACHE_KEY) || 'null');
+    if (!o || o.uid !== S.userId || !o.workers || !o.workers.length) return null;
+    if (Date.now() - o.at > 3*24*3600*1000) return null;   // เก่ากว่า 3 วันไม่ใช้
+    return o;
+  } catch(e) { return null; }
 }
 function renderWho(){
   const w = document.getElementById('who');
@@ -333,6 +363,7 @@ async function loadRange(force){
   const r = await call('getData', { from:f, to:t });
   S.jobs = r.jobs; S.leaves = r.leaves; S.holidays = r.holidays; S.checkins = r.checkins; S.workers = r.workers; S.version = r.version; S.today = r.today;
   S.loaded = { from:f, to:t };
+  saveCache();
   render();
 }
 
