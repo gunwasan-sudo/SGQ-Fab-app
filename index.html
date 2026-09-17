@@ -252,23 +252,26 @@ function fetchApi(body, timeout){
 // ยิงแบบ "hedged": Apps Script ตอบผ่าน redirect ไป script.googleusercontent.com ซึ่งวัดจริงล้ม ~1 ใน 3 ครั้ง
 // และแต่ละครั้งค้าง ~10 วิ ก่อนคืน 404 — ถ้ารอให้ล้มก่อนค่อยยิงซ้ำ แอปจะค้างเป็นสิบวิ
 // → ถ้าคำขอแรกยังไม่ตอบภายใน hedge ms ให้ยิงคำขอเดิม (reqId เดิม) คู่ขนานเพิ่ม เอาคำตอบแรกที่มา ตัวที่เหลือทิ้ง
-function hedgedFetch(body, { hedge, timeout, maxAttempts }){
+let netSlow = false;   // ครั้งล่าสุดช้า/ล้ม → ครั้งถัดไปยิง 2 คำขอพร้อมกันตั้งแต่แรก (Google ช้าเป็นช่วง ๆ ไม่ใช่ทีละคำขอ)
+function hedgedFetch(body, { hedge, timeout, maxAttempts, burst }){
   return new Promise((resolve, reject) => {
     let attempts = 0, inflight = 0, settled = false, lastErr = null, hedgeTimer = null;
+    const t0 = Date.now();
     const fire = () => {
       if (settled || attempts >= maxAttempts) return;
       attempts++; inflight++;
       fetchApi(body, timeout)
-        .then(o => { if (settled) return; settled = true; clearInterval(hedgeTimer); resolve(o); })
+        .then(o => { if (settled) return; settled = true; clearInterval(hedgeTimer); netSlow = (Date.now() - t0) > 6000; resolve(o); })
         .catch(e => { lastErr = e; })
         .finally(() => {
           inflight--;
           if (settled) return;
           if (attempts < maxAttempts) setTimeout(fire, 300);                          // ล้ม → ยิงใหม่ทันที
-          else if (inflight === 0) { clearInterval(hedgeTimer); reject(lastErr || new Error('เชื่อมต่อไม่ได้')); }
+          else if (inflight === 0) { clearInterval(hedgeTimer); netSlow = true; reject(lastErr || new Error('เชื่อมต่อไม่ได้')); }
         });
     };
     fire();
+    if (burst && netSlow) setTimeout(fire, 150);
     hedgeTimer = setInterval(fire, hedge);
   });
 }
@@ -279,7 +282,7 @@ async function callFetch(action, payload){
   const body = JSON.stringify({ action, payload, idToken: S.idToken, reqId });
   netStart(isWrite);
   let o;
-  try { o = await hedgedFetch(body, { hedge: heavy ? 20000 : isWrite ? 8000 : 3500, timeout: heavy ? 90000 : isWrite ? 60000 : 20000, maxAttempts: heavy ? 2 : 3 }); }
+  try { o = await hedgedFetch(body, { hedge: heavy ? 20000 : isWrite ? 8000 : 3500, timeout: heavy ? 90000 : isWrite ? 60000 : 20000, maxAttempts: heavy ? 2 : isWrite ? 3 : 4, burst: !heavy }); }
   finally { netEnd(isWrite); }
   if (o.ok) return o;
   if (o.code === 'token' && LIFF_ID && typeof liff !== 'undefined') {   // token หมดอายุ → ล็อกอินใหม่
