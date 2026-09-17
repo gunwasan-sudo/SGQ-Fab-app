@@ -282,7 +282,7 @@ async function callFetch(action, payload){
   const body = JSON.stringify({ action, payload, idToken: S.idToken, reqId });
   netStart(isWrite);
   let o;
-  try { o = await hedgedFetch(body, { hedge: heavy ? 20000 : isWrite ? 8000 : 3500, timeout: heavy ? 90000 : isWrite ? 60000 : 20000, maxAttempts: heavy ? 2 : isWrite ? 3 : 4, burst: !heavy }); }
+  try { o = await hedgedFetch(body, { hedge: heavy ? 20000 : isWrite ? 8000 : 3500, timeout: heavy ? 90000 : isWrite ? 60000 : 20000, maxAttempts: heavy ? 2 : 4, burst: !heavy }); }
   finally { netEnd(isWrite); }
   if (o.ok) return o;
   if (o.code === 'token' && LIFF_ID && typeof liff !== 'undefined') {   // token หมดอายุ → ล็อกอินใหม่
