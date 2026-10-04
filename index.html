@@ -490,6 +490,31 @@ function render(){
 }
 const worker = id => S.workers.find(w => w.worker_id === id);
 const typeColor = t => `var(--t-${t}, #475569)`;
+/* ===== สีตามโปรเจกต์: งานโปรเจกต์เดียวกันสีเดียวกันทุกวัน/ทุกมุมมอง, ต่างโปรเจกต์ต่างสี (คละแบบสุ่มแต่คงที่) =====
+   ชื่อ "บ้านคุณหมวย" = "คุณหมวย", "หมู่บ้านเอสเคฟ" = "หมู่เอสเคฟ" (ตัดคำนำหน้า/ช่องว่าง/สระซ้ำ)
+   เลือกสีจาก hash ของชื่อ ชนกับโปรเจกต์อื่นที่โหลดอยู่ → เลื่อนไปสีถัดไปที่ยังว่าง (ทุกสีอ่านตัวอักษรขาวได้) */
+const PROJ_COLORS = ['#2563eb','#dc2626','#15803d','#9333ea','#c2410c','#0e7490','#be185d','#4d7c0f','#a16207','#3730a3',
+  '#0f766e','#78350f','#64748b','#1e3a8a','#991b1b','#166534','#6b21a8','#9a3412','#155e75','#86198f'];
+function projKey(name){
+  const raw = String(name||'').normalize('NFC');
+  const k = raw.replace(/\[[^\]]*\]/g,'').replace(/([ั-ฺ็-๎])\1+/g,'$1').replace(/\s+/g,'')
+    .replace(/^(?:หมู่บ้าน|หมู่|บ้าน|คุณ|งาน|โครงการ)+/,'');
+  return k || raw;
+}
+function hashStr(s){ let h = 2166136261; for (const ch of s){ h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+let projMap = {}, projSig = '';
+function projColor(j){
+  const sig = S.jobs.length + ':' + S.version;
+  if (sig !== projSig) {
+    projSig = sig; projMap = {}; const used = new Set(), N = PROJ_COLORS.length;
+    [...new Set(S.jobs.map(x => projKey(x.customer)))]
+      .sort((a,b) => hashStr(a) - hashStr(b) || a.localeCompare(b))
+      .forEach(k => { let i = hashStr(k) % N; for (let n = 0; n < N && used.has(i); n++) i = (i + 1) % N;
+        used.add(i); if (used.size >= N) used.clear(); projMap[k] = PROJ_COLORS[i]; });
+  }
+  const k = projKey(j.customer);
+  return projMap[k] || PROJ_COLORS[hashStr(k) % PROJ_COLORS.length];
+}
 function checkinState(w){
   // ok=false = ต่อระบบเช็คอินไม่ได้ → ไม่แสดงสัญลักษณ์เลย (ไม่ให้ ⏳ ทุกคนจนเข้าใจผิด)
   if (!S.checkinEnabled || !S.checkins || !S.checkins.ok) return '';
@@ -529,8 +554,8 @@ function jobCard(j, showCheckin){
   }
   const photos = (j.done_photos||'').split('|').filter(Boolean);
   const atts = (j.attachments||'').split('|').filter(Boolean);
-  return `<div class="card ${j.status==='done'?'done':''}">
-    <div class="row"><span class="badge" style="background:${typeColor(j.job_type)}">${esc(T('types')[j.job_type]||j.job_type)}</span>
+  return `<div class="card ${j.status==='done'?'done':''}" style="border-left:6px solid ${projColor(j)}">
+    <div class="row"><span class="badge" style="background:${projColor(j)}">${esc(T('types')[j.job_type]||j.job_type)}</span>
       ${j.start_time?`<b>⏱ ${esc(j.start_time)}</b>`:''}<span style="flex:1"></span>
       <span class="st" style="background:var(--${j.status})">${esc(T('statuses')[j.status]||j.status)}</span></div>
     <div class="title">${esc(j.customer)}</div>
@@ -562,7 +587,7 @@ function renderWeek(ws){
       S.leaves.filter(l => l.worker_id===w.worker_id && l.date_from<=d && l.date_to>=d).forEach(l => c += `<span class="cell-chip lv">🏖 ${esc(l.type)}</span>`);
       S.jobs.filter(j => j.start_date<=d && j.end_date>=d && (j.assignees||'').split(',').map(s=>s.trim()).includes(w.worker_id) && j.status!=='cancelled')
         .sort((a,b)=>(a.start_time||'99').localeCompare(b.start_time||'99'))
-        .forEach(j => c += `<span class="cell-chip ${j.status==='done'?'done':''}" style="background:${typeColor(j.job_type)}" onclick="openDetail('${j.job_id}')">${j.start_time?j.start_time+' ':''}${esc(j.customer)}</span>`);
+        .forEach(j => c += `<span class="cell-chip ${j.status==='done'?'done':''}" style="background:${projColor(j)}" onclick="openDetail('${j.job_id}')">${j.start_time?j.start_time+' ':''}${esc(j.customer)}</span>`);
       h += `<td class="${d===S.today?'today':''} ${hol?'hol':''}">${c}</td>`;
     });
     h += '</tr>';
@@ -570,7 +595,7 @@ function renderWeek(ws){
   // งานที่ยังไม่ได้มอบหมายคน
   const un = days.map(d => S.jobs.filter(j => j.start_date<=d && j.end_date>=d && !(j.assignees||'').trim() && j.status!=='cancelled'));
   if (un.some(a=>a.length)){
-    h += `<tr><td>❓</td>` + un.map((a,i)=>`<td class="${days[i]===S.today?'today':''}">${a.map(j=>`<span class="cell-chip" style="background:${typeColor(j.job_type)}" onclick="openDetail('${j.job_id}')">${esc(j.customer)}</span>`).join('')}</td>`).join('') + '</tr>';
+    h += `<tr><td>❓</td>` + un.map((a,i)=>`<td class="${days[i]===S.today?'today':''}">${a.map(j=>`<span class="cell-chip" style="background:${projColor(j)}" onclick="openDetail('${j.job_id}')">${esc(j.customer)}</span>`).join('')}</td>`).join('') + '</tr>';
   }
   return h + '</table></div>';
 }
@@ -586,7 +611,7 @@ function renderMonth(d){
     const lv = S.leaves.filter(l => l.date_from<=ds && l.date_to>=ds);
     let c = `<div class="d ${out?'out':''} ${ds===S.today?'today':''} ${hol?'hol':''}" onclick="gotoDay('${ds}')"><span class="n">${dd.getDate()}</span>`;
     if (hol && !hol.weekly) c += `<span class="dot" style="background:#e11d48">🎌 ${esc(hol.name)}</span>`;
-    jobs.slice(0,3).forEach(j => c += `<span class="dot" style="background:${typeColor(j.job_type)};${j.status==='done'?'opacity:.5':''}" onclick="event.stopPropagation();openDetail('${j.job_id}')">${esc(j.customer)}</span>`);
+    jobs.slice(0,3).forEach(j => c += `<span class="dot" style="background:${projColor(j)};${j.status==='done'?'opacity:.5':''}" onclick="event.stopPropagation();openDetail('${j.job_id}')">${esc(j.customer)}</span>`);
     if (jobs.length>3) c += `<span class="more">+${jobs.length-3}</span>`;
     if (lv.length) c += `<div class="lvn">🏖 ${lv.length}</div>`;
     h += c + '</div>';
