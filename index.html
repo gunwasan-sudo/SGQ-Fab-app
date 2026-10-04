@@ -133,6 +133,7 @@
   <button class="mini adm" id="fabLeave" onclick="openLeave()" data-i="addLeave">ลงวันลา/หยุด</button>
   <button class="mini adm" id="fabHol" onclick="openHoliday()" data-i="addHoliday">วันหยุดบริษัท</button>
   <button class="mini adm" id="fabWorker" onclick="openWorker()" data-i="manageWorkers">เพิ่ม/แก้ช่าง</button>
+  <button class="mini adm" id="fabCast" onclick="openBroadcast()" data-i="broadcast">📢 บอร์ดแคสต์เข้ากลุ่ม</button>
   <button class="mini adm" id="fabJob" onclick="openJob()" data-i="addJob">+ ลงงาน</button>
   <button class="main" onclick="document.getElementById('fab').classList.toggle('open')">＋</button>
 </div>
@@ -153,6 +154,9 @@ const I18N = {
     leaveType:'ประเภท',holidayName:'ชื่อวันหยุด',date:'วันที่',confirmDel:'ยืนยันลบ?',saved:'บันทึกแล้ว',saving:'กำลังบันทึก...',updated:'มีการอัพเดตตาราง',refreshing:'กำลังอัพเดตข้อมูล...',refreshFail:'อัพเดตไม่ได้:',
     nameTh:'ชื่อ (ไทย)',nameMm:'ชื่อ (พม่า)',role:'บทบาท',active:'ใช้งาน',exporting:'กำลังสร้างไฟล์...',openPdf:'เปิด PDF',openXlsx:'เปิด Excel',openSheet:'เปิด Google Sheet',
     photos:'รูปงานเสร็จ',createdBy:'ลงโดย',weeklyOff:'วันหยุดประจำสัปดาห์',newWorker:'เพิ่มช่างใหม่',noAccess:'ยังไม่ได้ลงทะเบียน — เลือกชื่อของคุณ',finishNote:'หมายเหตุ (ถ้ามี)',week_of:'สัปดาห์',
+    broadcast:'📢 บอร์ดแคสต์เข้ากลุ่ม',bcToday:'งานวันนี้',bcTomorrow:'งานพรุ่งนี้',bcWeek:'สัปดาห์นี้',bcNextWeek:'สัปดาห์หน้า',bcCustom:'พิมพ์เอง',
+    bcSend:'📢 ส่งเข้ากลุ่ม',bcSending:'กำลังส่ง...',bcSent:'ส่งเข้ากลุ่มแล้ว',bcConfirm:'ยืนยันส่งข้อความนี้เข้ากลุ่ม LINE?',
+    bcHint:'แก้ข้อความได้ก่อนส่ง · ส่ง 1 ครั้งใช้โควตา LINE เท่าจำนวนคนในกลุ่ม · ลงงาน/แก้งานไม่ส่งอัตโนมัติ สรุปเช้า 07:30 / เย็น 18:00 ยังส่งตามเดิม',
     lvTypes:['ลากิจ','ลาป่วย','หยุด','อื่นๆ'],statuses:{planned:'รอดำเนินการ',in_progress:'กำลังทำ',done:'เสร็จแล้ว',postponed:'เลื่อน',cancelled:'ยกเลิก'},
     types:{'วัดหน้างาน':'วัดหน้างาน','ตัดประกอบ':'ตัดประกอบ','ติดตั้ง':'ติดตั้ง','แก้งาน':'แก้งาน','ส่งมอบ':'ส่งมอบ'},
     months:['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'],
@@ -168,6 +172,9 @@ const I18N = {
     leaveType:'အမျိုးအစား',holidayName:'ပိတ်ရက်အမည်',date:'ရက်စွဲ',confirmDel:'ဖျက်မှာသေချာလား?',saved:'သိမ်းပြီး',saving:'သိမ်းနေသည်...',updated:'ဇယား အသစ်ပြောင်းပြီ',refreshing:'အချက်အလက် အသစ်ပြောင်းနေသည်...',refreshFail:'အသစ်ပြောင်း၍မရပါ:',
     nameTh:'အမည် (ထိုင်း)',nameMm:'အမည် (မြန်မာ)',role:'ရာထူး',active:'အသုံးပြု',exporting:'ဖိုင်ထုတ်နေသည်...',openPdf:'PDF ဖွင့်',openXlsx:'Excel ဖွင့်',openSheet:'Google Sheet ဖွင့်',
     photos:'ပြီးစီးပုံများ',createdBy:'ထည့်သူ',weeklyOff:'အပတ်စဉ်ပိတ်ရက်',newWorker:'ဆရာအသစ်ထည့်',noAccess:'စာရင်းမသွင်းရသေး — သင့်နာမည်ရွေးပါ',finishNote:'မှတ်ချက် (ရှိလျှင်)',week_of:'အပတ်',
+    broadcast:'📢 ဂရုသို့ ကြေညာ',bcToday:'ဒီနေ့ အလုပ်',bcTomorrow:'မနက်ဖြန် အလုပ်',bcWeek:'ဒီအပတ်',bcNextWeek:'နောက်အပတ်',bcCustom:'ကိုယ်တိုင်ရေး',
+    bcSend:'📢 ဂရုသို့ ပို့',bcSending:'ပို့နေသည်...',bcSent:'ဂရုသို့ ပို့ပြီး',bcConfirm:'ဤစာကို LINE ဂရုသို့ ပို့မှာ သေချာလား?',
+    bcHint:'မပို့မီ စာပြင်နိုင်သည် · တစ်ကြိမ်ပို့လျှင် ဂရုအဖွဲ့ဝင်အရေအတွက်အတိုင်း LINE ကိုတာ သုံးသည် · မနက် 07:30 / ညနေ 18:00 အနှစ်ချုပ် ပုံမှန်အတိုင်း ပို့သည်',
     lvTypes:['ကိုယ်ရေးခွင့်','နာမကျန်းခွင့်','နားရက်','အခြား'],statuses:{planned:'စောင့်ဆိုင်း',in_progress:'လုပ်နေဆဲ',done:'ပြီးပြီ',postponed:'ရွှေ့',cancelled:'ပယ်ဖျက်'},
     types:{'วัดหน้างาน':'တိုင်းတာ','ตัดประกอบ':'ဖြတ်တပ်ဆင်','ติดตั้ง':'တပ်ဆင်','แก้งาน':'ပြင်ဆင်','ส่งมอบ':'လွှဲအပ်'},
     months:['ဇန်','ဖေ','မတ်','ဧပြီ','မေ','ဇွန်','ဇူ','ဩဂုတ်','စက်','အောက်','နို','ဒီ'],
@@ -234,7 +241,7 @@ function call(action, payload){
   });
 }
 // การเขียน (ต้องตรงกับ WRITE_ACTIONS ใน Code.gs) — backend กันเขียนซ้ำด้วย reqId จึงยิงซ้ำ/คู่ขนานได้อย่างปลอดภัย
-const WRITE_ACTIONS = ['register','saveJob','deleteJob','setStatus','uploadFile','saveLeave','deleteLeave','saveHoliday','deleteHoliday','saveWorker'];
+const WRITE_ACTIONS = ['register','saveJob','deleteJob','setStatus','uploadFile','saveLeave','deleteLeave','saveHoliday','deleteHoliday','saveWorker','broadcast'];
 let netBusy = 0, writesInFlight = 0;
 function netStart(isWrite){ netBusy++; if (isWrite) writesInFlight++; document.getElementById('netbar').classList.add('on'); }
 function netEnd(isWrite){ netBusy = Math.max(0, netBusy-1); if (isWrite) writesInFlight = Math.max(0, writesInFlight-1); if (!netBusy) document.getElementById('netbar').classList.remove('on'); }
@@ -784,6 +791,35 @@ async function openExport(){
     document.getElementById('ex_body').innerHTML = `<div class="acts" style="justify-content:center">
       <a class="btn p" href="${r.pdfUrl}" target="_blank">📄 ${T('openPdf')}</a><a class="btn g" href="${r.xlsxUrl}" target="_blank">📊 ${T('openXlsx')}</a><a class="btn" href="${r.sheetUrl}" target="_blank">${T('openSheet')}</a></div>`;
   }catch(e){ document.getElementById('ex_body').textContent = e.message; }
+}
+
+/* ================== บอร์ดแคสต์เข้ากลุ่ม (แอดมิน) ================== */
+// ลงงาน/แก้งานไม่ส่ง LINE อัตโนมัติแล้ว — แอดมินเลือกร่างข้อความ แก้ได้ แล้วกดส่งเข้ากลุ่มเอง
+const BC_KINDS = [['today','bcToday'],['tomorrow','bcTomorrow'],['week','bcWeek'],['nextweek','bcNextWeek'],['custom','bcCustom']];
+let bcSeq = 0;
+function openBroadcast(){
+  openModal(`<h3>${T('broadcast')}</h3>
+    <div class="acts" id="bc_kinds" style="flex-wrap:wrap;justify-content:flex-start;margin-top:0">${BC_KINDS.map(([k,l])=>`<button class="btn sm" data-k="${k}" onclick="bcPick('${k}')">${T(l)}</button>`).join('')}</div>
+    <textarea id="bc_text" rows="12" style="min-height:240px;font-size:14px"></textarea>
+    <div class="meta" style="margin-top:6px">${T('bcHint')}</div>
+    <div class="acts"><button class="btn p" id="bc_send" onclick="sendBroadcast()">${T('bcSend')}</button><button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+  bcPick('today');
+}
+async function bcPick(kind){
+  document.querySelectorAll('#bc_kinds .btn').forEach(b => b.classList.toggle('p', b.dataset.k === kind));
+  const ta = document.getElementById('bc_text'); ta.dataset.kind = kind;
+  if (kind === 'custom') { ta.value = ''; ta.placeholder = ''; ta.focus(); return; }
+  const seq = ++bcSeq; ta.value = ''; ta.placeholder = T('loading');
+  try{ const r = await call('broadcastPreview',{ kind }); if (seq === bcSeq && document.getElementById('bc_text')) { ta.value = r.text; ta.placeholder = ''; } }
+  catch(e){ if (seq === bcSeq) ta.placeholder = e.message; }
+}
+async function sendBroadcast(){
+  const ta = document.getElementById('bc_text'), btn = document.getElementById('bc_send');
+  const text = ta.value.trim(); if (!text) return;
+  if (!confirm(T('bcConfirm'))) return;
+  btn.disabled = true; btn.textContent = T('bcSending');
+  try{ await call('broadcast',{ text, kind: ta.dataset.kind }); closeModal(); toast(T('bcSent')); }
+  catch(e){ btn.disabled = false; btn.textContent = T('bcSend'); alert(e.message); }
 }
 
 /* ================== image helpers ================== */
