@@ -315,7 +315,7 @@ function toast(msg){ const t = document.getElementById('toast'); t.textContent =
    → โหลดใหม่ด้วย ?v=<build> (URL ใหม่ = ไม่โดนแคช) · ไม่โหลดใหม่ขณะมีการบันทึกค้าง/เปิดฟอร์มอยู่ (ลองใหม่รอบหน้า)
    · กันวนด้วย sessionStorage (โหลดใหม่ได้ครั้งเดียวต่อ build) · เช็กเฉพาะบน github.io (demo/Apps Script ข้าม)
    **แก้ index.html แล้วต้องเปลี่ยน APP_BUILD ทุกครั้ง** ไม่งั้นเครื่องที่ติดแคชจะไม่รู้ว่ามีของใหม่ */
-const APP_BUILD = '2026-10-05.1';
+const APP_BUILD = '2026-10-05.2';
 let updChecking = false, updLast = 0;
 async function checkAppUpdate(){
   if (!/\.github\.io$/.test(location.hostname)) return;
