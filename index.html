@@ -309,8 +309,39 @@ function upsertLocal(list, key, obj){ const i = list.findIndex(x => x[key] === o
 function step(m){ const el = document.getElementById('loaderTxt'); if (el) el.textContent = m; }
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; setTimeout(()=>t.style.display='none', 2200); }
 
+/* ================== อัพเดตหน้าแอปอัตโนมัติ ==================
+   GitHub Pages ให้แคช HTML 10 นาที (เบราว์เซอร์ใน LINE อาจนานกว่า) → อัพเดตแล้วช่างยังเห็นหน้าเก่า
+   ตอนเปิดแอป/กลับมาที่แอป: ดึง index.html สด (no-store + ?_=เวลา) อ่าน APP_BUILD ถ้าไม่ตรงกับหน้านี้
+   → โหลดใหม่ด้วย ?v=<build> (URL ใหม่ = ไม่โดนแคช) · ไม่โหลดใหม่ขณะมีการบันทึกค้าง/เปิดฟอร์มอยู่ (ลองใหม่รอบหน้า)
+   · กันวนด้วย sessionStorage (โหลดใหม่ได้ครั้งเดียวต่อ build) · เช็กเฉพาะบน github.io (demo/Apps Script ข้าม)
+   **แก้ index.html แล้วต้องเปลี่ยน APP_BUILD ทุกครั้ง** ไม่งั้นเครื่องที่ติดแคชจะไม่รู้ว่ามีของใหม่ */
+const APP_BUILD = '2026-10-05.1';
+let updChecking = false, updLast = 0;
+async function checkAppUpdate(){
+  if (!/\.github\.io$/.test(location.hostname)) return;
+  if (updChecking || Date.now() - updLast < 60000) return;   // ไม่เช็กถี่กว่า 1 นาที/ครั้ง
+  updChecking = true; updLast = Date.now();
+  try {
+    const ctl = new AbortController(); const tm = setTimeout(() => ctl.abort(), 8000);
+    const html = await fetch(location.pathname + '?_=' + Date.now(), { cache: 'no-store', signal: ctl.signal }).then(r => r.ok ? r.text() : '');
+    clearTimeout(tm);
+    const m = html.match(/const APP_BUILD = '([^']+)'/);
+    if (!m || m[1] === APP_BUILD) return;
+    const key = 'sgq_reloaded_' + m[1];
+    try { if (sessionStorage.getItem(key)) return; } catch(e) {}
+    const busy = S.jobs.some(j => j._pending) || S.leaves.some(l => /^tmp/.test(String(l.leave_id))) || ov().classList.contains('on');
+    if (busy) { updLast = 0; return; }
+    try { sessionStorage.setItem(key, '1'); } catch(e) {}
+    const u = new URL(location.origin + location.pathname);
+    if (/[?&]nologin=1/.test(location.search)) u.searchParams.set('nologin', '1');
+    u.searchParams.set('v', m[1]);
+    location.replace(u.toString());
+  } catch(e) {} finally { updChecking = false; }
+}
+
 /* ================== boot ================== */
 async function boot(){
+  checkAppUpdate();   // เบื้องหลัง ไม่รอ — มีของใหม่จะโหลดหน้าใหม่เอง
   try{
     if (LIFF_ID){
       step('1/4 เชื่อมต่อ LINE...');
@@ -348,7 +379,7 @@ async function boot(){
     if (r && !S.user && !S.isAdmin) openRegister();
     // poll ทุก 20 วิ และหยุดเมื่อแอปอยู่เบื้องหลัง — ประหยัดโควตารันสคริปต์ (ฟรี 90 นาที/วัน)
     setInterval(() => { if (!document.hidden) pollVersion(); }, 20000);
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) pollVersion(); });
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) { pollVersion(); checkAppUpdate(); } });
   }catch(e){
     const inLine = /Line\//i.test(navigator.userAgent);
     document.getElementById('loaderTxt').innerHTML =
