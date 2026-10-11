@@ -2,142 +2,289 @@
 <html lang="th">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>SGQ ตารางงานทีมช่าง</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;700&family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
 <style>
-  :root{--bg:#f3f4f6;--card:#fff;--line:#e5e7eb;--text:#111827;--muted:#6b7280;--brand:#0f4c81;--brand2:#1e6fb5;
-    --planned:#6b7280;--in_progress:#d97706;--done:#16a34a;--postponed:#7c3aed;--cancelled:#dc2626;
-    --t-วัดหน้างาน:#0284c7;--t-ตัดประกอบ:#7c3aed;--t-ติดตั้ง:#16a34a;--t-แก้งาน:#d97706;--t-ส่งมอบ:#0f766e;}
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{margin:0;font-family:"Noto Sans Thai","Noto Sans Myanmar",system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:17px;padding-bottom:90px}
-  header{background:var(--brand);color:#fff;padding:10px 12px 0;position:sticky;top:0;z-index:20}
-  .top{display:flex;align-items:center;gap:8px}
-  .top h1{font-size:18px;margin:0;flex:1;font-weight:700}
-  .top .who{font-size:13px;opacity:.9;text-align:right;line-height:1.2}
-  .lang{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:16px;padding:3px 10px;font-size:13px}
-  .tabs{display:flex;gap:8px;margin-top:10px;padding-bottom:10px}
-  .tabs button{flex:1;border:1px solid rgba(255,255,255,.35);border-radius:10px;background:linear-gradient(#2a6aa8,#1a5590);color:#fff;padding:8px 0;font-size:16px;font-weight:600;font-family:inherit;box-shadow:0 3px 0 rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.3);transition:transform .08s}
-  .tabs button:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.35)}
-  .tabs button.on{background:linear-gradient(#ffffff,#e8eef5);color:var(--brand);border-color:#fff;box-shadow:0 4px 8px rgba(0,0,0,.35),inset 0 1px 0 #fff;transform:translateY(-1px)}
-  .nav{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:86px;z-index:19}
-  .nav button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-size:16px;font-family:inherit}
-  .nav .lbl{flex:1;text-align:center;font-weight:700;font-size:17px}
-  .chips{display:flex;gap:6px;padding:8px 12px;overflow-x:auto}
-  .chip{border:1px solid var(--line);background:#fff;border-radius:16px;padding:4px 12px;font-size:15px;white-space:nowrap;font-family:inherit}
-  .chip.on{background:var(--brand);color:#fff;border-color:var(--brand)}
-  main{padding:0 12px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-  .card.done{opacity:.72}
-  .row{display:flex;align-items:center;gap:8px}
-  .badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:13px;color:#fff;font-weight:500}
-  .st{display:inline-block;padding:2px 8px;border-radius:12px;font-size:13px;color:#fff}
-  .title{font-weight:700;font-size:18px;margin:4px 0}
-  .meta{color:var(--muted);font-size:15px;line-height:1.5}
-  .meta a{color:var(--brand2)}
-  .ppl{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
-  .ppl span{background:#eef2ff;color:#3730a3;border-radius:6px;padding:2px 8px;font-size:13px}
-  .ppl span.ci{background:#dcfce7;color:#166534}
-  .ppl span.nci{background:#fee2e2;color:#991b1b}
-  .ppl span.me{outline:2px solid #3730a3}
-  .acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-  .btn{border:none;border-radius:8px;padding:8px 14px;font-size:16px;font-family:inherit;background:#e5e7eb;color:#111}
-  .btn.p{background:var(--brand);color:#fff}.btn.g{background:var(--done);color:#fff}.btn.w{background:var(--in_progress);color:#fff}.btn.d{background:var(--cancelled);color:#fff}
-  .btn.sm{padding:5px 10px;font-size:15px}
-  .empty{text-align:center;color:var(--muted);padding:30px 0}
-  .banner{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:16px}
-  .leaveline{background:#f1f5f9;border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:15px;color:#334155}
-  /* week */
-  .wk{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:12px}
-  table.wk-t{border-collapse:collapse;min-width:780px;width:100%}
-  .wk-t th,.wk-t td{border:1px solid var(--line);vertical-align:top;padding:4px;font-size:13px}
-  .wk-t th{background:#f8fafc;font-weight:600;position:sticky;top:0}
-  .wk-t th.today,.wk-t td.today{background:#eff6ff}
-  .wk-t th.hol,.wk-t td.hol{background:#fff1f2}
-  .wk-t td:first-child,.wk-t th:first-child{position:sticky;left:0;background:#f8fafc;font-weight:600;min-width:80px;z-index:1}
-  .cell-chip{display:block;border-radius:5px;padding:2px 5px;margin-bottom:3px;color:#fff;font-size:12px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:140px}
-  .cell-chip.lv{background:#94a3b8}
-  .cell-chip.done{opacity:.55;text-decoration:line-through}
-  /* month */
-  .mo{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  .mo .h{background:#f8fafc;text-align:center;font-size:13px;padding:6px 0;font-weight:600}
-  .mo .d{background:#fff;min-height:82px;min-width:0;overflow:hidden;padding:3px;font-size:12px}
-  .mo .d.out{background:#f9fafb;color:#9ca3af}
-  .mo .d.today .n{background:var(--brand);color:#fff;border-radius:10px}
-  .mo .d.hol{background:#fff1f2}
-  .mo .n{display:inline-block;padding:0 5px;font-weight:600;font-size:13px}
-  .mo .dot{display:block;cursor:pointer;border-radius:3px;padding:1px 3px;margin-top:2px;color:#fff;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .mo .more{color:var(--muted);font-size:11px}
-  .mo .lvn{font-size:11px;color:#64748b}
-  /* fab */
-  .fab{position:fixed;right:16px;bottom:20px;z-index:30;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-  .fab .main{width:56px;height:56px;border-radius:50%;background:var(--brand);color:#fff;font-size:30px;border:none;box-shadow:0 4px 12px rgba(0,0,0,.25)}
-  .fab .mini{background:#fff;border:1px solid var(--line);border-radius:20px;padding:8px 14px;font-size:15px;font-family:inherit;box-shadow:0 2px 6px rgba(0,0,0,.12);display:none}
-  .fab.open .mini{display:block}
-  .fab.noadmin .adm{display:none!important}
-  /* modal */
-  .ov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;display:none;align-items:center;justify-content:center;padding:16px}
-  .ov.on{display:flex}
-  .sheet{background:#fff;width:min(92vw,440px);max-height:85vh;overflow-y:auto;border-radius:16px;padding:14px 14px 18px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
-  .sheet h3{margin:0 0 10px;font-size:19px}
-  label{display:block;font-size:15px;color:var(--muted);margin:10px 0 3px}
-  input,select,textarea{width:100%;min-width:0;max-width:100%;border:1px solid #d1d5db;border-radius:8px;padding:9px 10px;font-size:17px;font-family:inherit;background:#fff}
-  textarea{min-height:70px}
-  .g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
-  .cbs{display:flex;flex-wrap:wrap;gap:6px}
-  .cbs label{display:flex;align-items:center;gap:5px;margin:0;border:1px solid var(--line);border-radius:16px;padding:5px 10px;color:var(--text);font-size:16px}
-  .cbs input{width:auto}
-  .thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-  .thumbs img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
-  .thumbs a{font-size:13px}
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:90px;background:#111;color:#fff;padding:8px 16px;border-radius:20px;font-size:15px;z-index:60;display:none}
-  .live{display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-left:4px}
-  .live.off{background:#f59e0b}
-  /* แถบบาง ๆ บนสุด = กำลังคุยกับเซิร์ฟเวอร์ (แทนการค้างเงียบ ๆ) */
-  .netbar{position:fixed;left:0;right:0;top:0;height:3px;z-index:200;display:none;background:linear-gradient(90deg,#93c5fd,#1e6fb5,#93c5fd);background-size:200% 100%}
-  .netbar.on{display:block;animation:nb 1.1s linear infinite}
-  @keyframes nb{from{background-position:0 0}to{background-position:200% 0}}
-  .pend{font-size:14px;color:#b45309;background:#fef3c7;border-radius:8px;padding:4px 10px}
-  .wk,.chips,.sheet{-webkit-overflow-scrolling:touch}
-  #loader{position:fixed;inset:0;background:#fff;z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--muted)}
+/* ===== UI v2 (ต.ค. 2569) — ตกลงจาก sample-ui-v2.html: แถบเมนูล่างจอ, Gantt สัปดาห์, แถบงานข้ามวันในเดือน ===== */
+:root{
+  --bg:#eef2f7; --surface:#fff; --ink:#0f172a; --ink2:#475569; --ink3:#94a3b8; --line:#e2e8f0;
+  --brand:#0f4c81; --brand2:#1d6fd1; --brandSoft:#e7f0fb;
+  --ok:#16a34a; --okSoft:#dcfce7; --warn:#d97706; --warnSoft:#fef3c7; --bad:#dc2626; --badSoft:#fee2e2;
+  --offBg:#fff1f2; --offInk:#e11d48;
+  --r:16px; --sh:0 1px 2px rgba(15,23,42,.06),0 6px 18px rgba(15,23,42,.07);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#d9e0ea}
+body{font-family:"Noto Sans Thai","Noto Sans Myanmar",system-ui,sans-serif;color:var(--ink);font-size:16px;line-height:1.45}
+button{font-family:inherit;font-size:inherit;color:inherit;cursor:pointer}
+a{color:var(--brand2)}
+.app{max-width:440px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:104px}
+
+/* header */
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(135deg,#0f4c81,#1a5f9e);color:#fff;box-shadow:0 2px 10px rgba(15,76,129,.25)}
+.logo{width:40px;height:40px;border-radius:12px;background:#fff;color:var(--brand);font-weight:800;font-size:14px;display:grid;place-items:center;letter-spacing:.5px;flex:none}
+.top .t1{font-weight:700;font-size:17px;line-height:1.2;display:flex;align-items:center;gap:6px}
+.top .t2{font-size:13px;opacity:.85}
+.top .sp{flex:1}
+.live{display:inline-block;width:8px;height:8px;border-radius:50%;background:#4ade80;flex:none}
+.live.off{background:#fbbf24}
+.langbtn{border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.14);color:#fff;border-radius:999px;padding:5px 12px;font-size:13px;flex:none}
+.meav{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:#fff;color:var(--brand);border:2px solid rgba(255,255,255,.6);flex:none;padding:0}
+
+main{padding:14px 14px 0}
+
+/* section head */
+.shead{display:flex;align-items:center;gap:8px;margin:2px 2px 10px}
+.shead h2{margin:0;font-size:20px;font-weight:700;flex:1;min-width:0}
+.navbtn{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:#fff;display:grid;place-items:center;box-shadow:0 1px 2px rgba(0,0,0,.05);flex:none;padding:0}
+.todaybtn{height:38px;border-radius:12px;border:1px solid var(--brand);background:#fff;color:var(--brand);padding:0 12px;font-weight:600;font-size:14px;flex:none}
+.loadline{background:#fff7e6;color:#92400e;border-radius:12px;padding:8px 12px;margin-bottom:10px;font-size:14px}
+
+/* week strip */
+.strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px}
+.sday{border:none;background:#fff;border-radius:14px;padding:8px 0 7px;display:flex;flex-direction:column;align-items:center;gap:1px;box-shadow:0 1px 2px rgba(15,23,42,.06)}
+.sday .dn{font-size:12px;color:var(--ink2)}
+.sday .dd{font-size:19px;font-weight:700}
+.sday .dots{display:flex;gap:3px;height:7px;margin-top:2px}
+.sday .dots i{width:6px;height:6px;border-radius:50%;display:block}
+.sday.off{background:var(--offBg)} .sday.off .dn,.sday.off .dd{color:var(--offInk)}
+.sday.today{outline:2px solid var(--brand2);outline-offset:-2px}
+.sday.sel{background:var(--brand);box-shadow:0 6px 14px rgba(15,76,129,.35);transform:translateY(-2px)}
+.sday.sel .dn,.sday.sel .dd{color:#fff}
+
+/* summary */
+.summary{background:#fff;border-radius:var(--r);box-shadow:var(--sh);padding:14px;margin-bottom:12px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{border-radius:12px;padding:8px 10px;background:#f8fafc}
+.stat b{display:block;font-size:24px;line-height:1.1}
+.stat span{font-size:13px;color:var(--ink2)}
+.stat.prog{background:var(--warnSoft)} .stat.prog b{color:var(--warn)}
+.stat.done{background:var(--okSoft)} .stat.done b{color:var(--ok)}
+.crewrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:10px 4px;padding:14px 0 2px}
+.cw{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--ink2);text-align:center;line-height:1.2}
+.warnline{margin-top:10px;background:var(--badSoft);color:#991b1b;border-radius:10px;padding:8px 10px;font-size:14px}
+.leaveline{margin-top:10px;background:#f1f5f9;color:#334155;border-radius:10px;padding:8px 10px;font-size:14px}
+.leaveline a{color:var(--bad);text-decoration:none;font-weight:700;margin-left:2px}
+.holline{margin-bottom:12px;background:var(--offBg);color:#9f1239;border-radius:12px;padding:10px 12px;font-size:15px;font-weight:600}
+
+/* avatar */
+.av{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;font-size:15px;position:relative;flex:none}
+.av.sm{width:30px;height:30px;font-size:12px}
+.av .ring{position:absolute;right:-2px;bottom:-2px;width:15px;height:15px;border-radius:50%;border:2px solid #fff;display:grid;place-items:center;font-size:8px;color:#fff;line-height:1}
+.av.sm .ring{width:12px;height:12px;font-size:7px}
+.ring.in{background:var(--ok)} .ring.wait{background:var(--warn)} .ring.lv{background:#94a3b8}
+.av.me{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--brand)}
+
+/* chips */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:14px;white-space:nowrap;font-weight:500}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* job card */
+.job{background:#fff;border-radius:var(--r);box-shadow:var(--sh);padding:14px 14px 14px 18px;margin-bottom:12px;position:relative;overflow:hidden;cursor:pointer}
+.job::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--pc)}
+.job.isdone{opacity:.72}
+.row1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.type{display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;background:#f1f5f9;color:#334155;background:color-mix(in srgb,var(--pc) 14%,#fff);color:color-mix(in srgb,var(--pc) 75%,#000)}
+.time{font-weight:700;font-size:15px}
+.st{margin-left:auto;font-size:13px;font-weight:600;padding:3px 10px;border-radius:999px;white-space:nowrap}
+.st-planned{background:#f1f5f9;color:#475569}
+.st-in_progress{background:var(--warnSoft);color:#b45309}
+.st-done{background:var(--okSoft);color:#15803d}
+.st-postponed{background:#ede9fe;color:#6d28d9}
+.st-cancelled{background:var(--badSoft);color:#b91c1c}
+.job h3{margin:8px 0 2px;font-size:19px;line-height:1.3}
+.spanline{font-size:13px;color:var(--ink2)}
+.spanline b{color:var(--ink);font-weight:600}
+.job .detail{margin:8px 0 0;font-size:15px;color:#334155;white-space:pre-line}
+.job .note{margin:6px 0 0;font-size:14px;color:var(--ink2)}
+.addr{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:14px;color:var(--ink2)}
+.addr span{flex:1;min-width:0}
+.go{margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:10px;padding:5px 10px;font-size:13px;font-weight:600;color:var(--brand);text-decoration:none;white-space:nowrap;flex:none}
+.crew{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
+.crew .names{font-size:13px;color:var(--ink2);margin-left:4px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.acts.one{grid-template-columns:1fr}
+.btn{border:none;border-radius:12px;padding:12px 10px;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.btn.start{background:var(--warn);color:#fff;box-shadow:0 3px 0 #b45309}
+.btn.finish{background:var(--ok);color:#fff;box-shadow:0 3px 0 #15803d}
+.btn.ghost{background:#f1f5f9;color:var(--ink);font-weight:600}
+.btn.primary{background:var(--brand);color:#fff;box-shadow:0 3px 0 #0a365c}
+.btn.danger{background:#fff;color:var(--bad);border:1px solid #fecaca;font-weight:600}
+.btn.red{background:var(--bad);color:#fff;box-shadow:0 3px 0 #991b1b}
+.btn.sm{padding:8px 10px;font-size:14px}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn:disabled{opacity:.6}
+.mine-tag{position:absolute;top:0;right:0;background:var(--brand);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-bottom-left-radius:10px}
+.pend{margin-top:12px;font-size:14px;color:#b45309;background:#fef3c7;border-radius:10px;padding:8px 12px;text-align:center}
+
+.empty{background:#fff;border-radius:var(--r);padding:28px 16px;text-align:center;color:var(--ink2);box-shadow:var(--sh)}
+.empty .big{font-size:40px}
+.offcard{background:linear-gradient(135deg,#fff1f2,#ffe4e6);color:#9f1239;border-radius:var(--r);padding:22px 16px;text-align:center;box-shadow:var(--sh)}
+.offcard .big{font-size:42px}
+
+/* week gantt */
+.gwrap{background:#fff;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.ghead,.wrow{display:grid;grid-template-columns:58px repeat(7,minmax(0,1fr))}
+.ghead div{padding:8px 2px;text-align:center;font-size:12px;color:var(--ink2);border-bottom:1px solid var(--line);line-height:1.25;cursor:pointer}
+.ghead div b{display:block;font-size:16px;color:var(--ink);margin:1px auto 0;width:28px;line-height:24px}
+.ghead .off,.ghead .off b{color:var(--offInk)}
+.ghead .today b{color:#fff;background:var(--brand);border-radius:8px}
+.ghead .corner{cursor:default}
+.ghead small{display:block;font-size:9px;color:var(--offInk);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wrow{grid-auto-rows:32px;border-bottom:1px solid var(--line);padding:4px 0}
+.wrow:last-child{border-bottom:none}
+.wname{grid-column:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;font-weight:600;line-height:1.2;text-align:center;background:#fff;z-index:2;padding:0 2px;overflow:hidden}
+.gcell{z-index:0}
+.gcell.off{background:var(--offBg)}
+.gcell.today{background:#eef5fd}
+.bar{z-index:1;margin:2px 1px;border-radius:7px;color:#fff;font-size:11.5px;font-weight:600;padding:0 5px;min-width:0;display:flex;align-items:center;white-space:nowrap;overflow:hidden;border:none;text-align:left}
+.bar span{overflow:hidden;text-overflow:ellipsis}
+.bar.isdone{opacity:.45}
+.bar.leave{background:repeating-linear-gradient(45deg,#cbd5e1,#cbd5e1 6px,#e2e8f0 6px,#e2e8f0 12px);color:#334155}
+.bar.clash{outline:2px dashed var(--bad);outline-offset:-2px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--ink2);margin:10px 4px 0}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:3px;vertical-align:middle;margin-right:4px}
+
+/* month */
+.mcal{background:#fff;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.mhead{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-bottom:1px solid var(--line)}
+.mhead div{text-align:center;font-size:12px;font-weight:600;color:var(--ink2);padding:8px 0}
+.mhead div.off{color:var(--offInk)}
+.mweek{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:26px repeat(3,19px) 17px;border-bottom:1px solid var(--line)}
+.mweek:last-child{border-bottom:none}
+.mday{grid-row:1/6;padding:3px 0 0 5px;font-size:13px;font-weight:600;border:none;background:none;text-align:left;display:flex;flex-direction:column;box-shadow:inset -1px 0 #eef2f6}
+.mday.out{color:#cbd5e1}
+.mday.off{background:var(--offBg);color:var(--offInk)}
+.mday.out.off{color:#fda4af}
+.mday .n{width:24px;height:22px;display:grid;place-items:center;border-radius:7px}
+.mday.today .n{background:var(--brand);color:#fff}
+.mbar{z-index:1;margin:1px;border-radius:5px;color:#fff;font-size:11px;font-weight:600;padding:0 5px;display:flex;align-items:center;white-space:nowrap;overflow:hidden;border:none;min-width:0}
+.mbar span{overflow:hidden;text-overflow:ellipsis}
+.mbar.isdone{opacity:.45}
+.mbar.hol{background:#e11d48}
+.mbar.cont{border-top-left-radius:0;border-bottom-left-radius:0;margin-left:0}
+.mbar.goes{border-top-right-radius:0;border-bottom-right-radius:0;margin-right:0}
+.mmore{grid-row:5;font-size:11px;color:var(--ink2);padding-left:6px;z-index:1;pointer-events:none}
+.plist{background:#fff;border-radius:var(--r);box-shadow:var(--sh);margin-top:12px;padding:6px 0}
+.plist h4{margin:8px 14px 4px;font-size:15px}
+.pitem{display:flex;align-items:center;gap:10px;padding:9px 14px;border:none;background:none;width:100%;text-align:left;border-top:1px solid #f1f5f9}
+.pitem i{width:12px;height:36px;border-radius:6px;flex:none}
+.pitem .pt{flex:1;min-width:0}
+.pitem .pt b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pitem .pt span{font-size:13px;color:var(--ink2)}
+.pitem .cnt{font-size:13px;color:var(--ink2);white-space:nowrap}
+
+/* menu */
+.mlist{background:#fff;border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:12px}
+.mitem{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border:none;background:none;text-align:left;border-top:1px solid #f1f5f9;font-size:16px}
+.mitem:first-child{border-top:none}
+.mitem .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none}
+.mitem .tx{flex:1}
+.mitem .tx small{display:block;color:var(--ink2);font-size:13px}
+.mitem .chev{color:var(--ink3)}
+.mtitle{font-size:13px;font-weight:600;color:var(--ink2);margin:6px 4px 8px;letter-spacing:.3px}
+.meinfo{display:flex;align-items:center;gap:12px;background:#fff;border-radius:var(--r);box-shadow:var(--sh);padding:14px 16px;margin-bottom:12px}
+.meinfo small{display:block;color:var(--ink2);font-size:13px}
+
+/* bottom nav */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(100%,440px);z-index:40;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -4px 18px rgba(15,23,42,.08)}
+.bnav.nofab{grid-template-columns:repeat(4,1fr)}
+.nb{border:none;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:12px;font-weight:600;color:var(--ink3);border-radius:14px}
+.nb svg{width:24px;height:24px}
+.nb.on{color:var(--brand);background:var(--brandSoft)}
+.fab{display:flex;justify-content:center;align-items:flex-start}
+.fab button{width:58px;height:58px;margin-top:-26px;border-radius:50%;border:4px solid #fff;background:linear-gradient(135deg,#1d6fd1,#0f4c81);color:#fff;font-size:30px;line-height:1;box-shadow:0 6px 16px rgba(15,76,129,.45);display:grid;place-items:center;padding:0}
+
+/* modal (กล่องกลางจอ) */
+.ov{position:fixed;inset:0;z-index:60;background:rgba(15,23,42,.5);display:none;align-items:center;justify-content:center;padding:16px}
+.ov.on{display:flex;animation:fade .15s ease}
+.sheet{background:#fff;width:min(100%,408px);max-height:86vh;overflow-y:auto;border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,.35);animation:pop .18s ease;-webkit-overflow-scrolling:touch}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{transform:translateY(12px) scale(.97);opacity:.4}to{transform:none;opacity:1}}
+.dhead{padding:16px 18px 14px;color:#fff;background:var(--pc,var(--brand));position:relative}
+.dhead .type{background:rgba(255,255,255,.22);color:#fff}
+.dhead h3{margin:8px 40px 2px 0;font-size:21px;line-height:1.3}
+.dhead .sub{font-size:14px;opacity:.9}
+.x{position:absolute;right:12px;top:12px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.22);color:#fff;font-size:18px;padding:0}
+.dbody{padding:16px 18px 18px}
+.dtitle{font-size:20px;font-weight:700;margin:0 0 12px}
+.dsub{margin:-6px 0 12px;color:var(--ink2);font-size:14px}
+.stepper{display:flex;align-items:center;margin:0 0 16px}
+.stepper .sp{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--ink3);flex:none;width:64px;text-align:center}
+.stepper .sp i{width:26px;height:26px;border-radius:50%;background:#e2e8f0;display:grid;place-items:center;font-style:normal;font-size:13px;color:#fff;font-weight:700}
+.stepper .sp.done i{background:var(--ok)} .stepper .sp.cur i{background:var(--warn);box-shadow:0 0 0 4px var(--warnSoft)}
+.stepper .sp.done,.stepper .sp.cur{color:var(--ink)}
+.stepper .ln{flex:1;height:3px;background:#e2e8f0;margin-bottom:18px;border-radius:2px}
+.stepper .ln.done{background:var(--ok)}
+.stbadge{display:inline-block;margin-bottom:14px}
+.info{display:grid;grid-template-columns:26px 1fr;gap:10px 8px;font-size:15px;margin-bottom:14px}
+.info .k{font-size:18px;text-align:center}
+.info .v{min-width:0;overflow-wrap:anywhere;white-space:pre-line}
+.info .v small{display:block;color:var(--ink2);font-size:13px}
+.plist2{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.prow{display:flex;align-items:center;gap:10px;font-size:15px}
+.prow .tag{margin-left:auto;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px}
+.tag.in{background:var(--okSoft);color:#15803d} .tag.wait{background:var(--warnSoft);color:#b45309} .tag.lv{background:#f1f5f9;color:#475569}
+.dacts{display:grid;gap:8px}
+.dacts.two{grid-template-columns:1fr 1fr}
+
+/* form */
+.f label{display:block;font-size:14px;font-weight:600;color:var(--ink2);margin:12px 0 6px}
+.f input,.f textarea,.f select{width:100%;min-width:0;max-width:100%;border:1.5px solid #dbe2ea;border-radius:12px;padding:11px 12px;font:inherit;font-size:16px;background:#fff;color:var(--ink)}
+.f input[type=file]{padding:8px;font-size:14px}
+.f input:focus,.f textarea:focus,.f select:focus{outline:none;border-color:var(--brand2);box-shadow:0 0 0 3px var(--brandSoft)}
+.f textarea{min-height:76px;resize:vertical}
+.f .cbline{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink)}
+.f .cbline input{width:auto}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.tchips{display:flex;flex-wrap:wrap;gap:6px}
+.tchip{border:1.5px solid #dbe2ea;background:#fff;border-radius:999px;padding:7px 12px;font-size:14px;font-weight:500}
+.tchip.on{border-color:var(--brand);background:var(--brandSoft);color:var(--brand);font-weight:700}
+.pick{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.pk{border:1.5px solid #dbe2ea;background:#fff;border-radius:14px;padding:8px 2px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;position:relative;line-height:1.2;text-align:center}
+.pk.on{border-color:var(--brand);background:var(--brandSoft)}
+.pk.on::after{content:"✓";position:absolute;top:4px;right:6px;color:var(--brand);font-weight:800;font-size:13px}
+.pk.lv{opacity:.55}
+.pk small{font-weight:400;color:var(--ink3);font-size:10px}
+.teamlbl{grid-column:1/-1;font-size:12px;color:var(--ink3);font-weight:600;margin-top:4px}
+.hint{font-size:13px;color:var(--ink2);margin-top:6px;font-weight:400}
+.hint.bad{color:var(--bad)}
+.photo{border:2px dashed #cbd5e1;border-radius:16px;padding:22px 10px;text-align:center;color:var(--ink2);background:#f8fafc;display:block;cursor:pointer;font-weight:600}
+.photo .big{font-size:36px}
+.photo input{display:none}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.thumbs img{width:72px;height:72px;object-fit:cover;border-radius:12px;display:block}
+.thumbs span{display:flex;flex-direction:column;align-items:center;font-size:12px}
+.thumbs a.file{display:inline-flex;align-items:center;gap:4px;font-size:13px;background:#f1f5f9;border-radius:10px;padding:6px 10px;text-decoration:none}
+.bctext{min-height:220px;font-size:14px !important;line-height:1.5}
+
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:999px;font-size:14px;z-index:80;display:none;max-width:90vw;text-align:center}
+/* แถบบาง ๆ บนสุด = กำลังคุยกับเซิร์ฟเวอร์ */
+.netbar{position:fixed;left:0;right:0;top:0;height:3px;z-index:200;display:none;background:linear-gradient(90deg,#93c5fd,#1e6fb5,#93c5fd);background-size:200% 100%}
+.netbar.on{display:block;animation:nb 1.1s linear infinite}
+@keyframes nb{from{background-position:0 0}to{background-position:200% 0}}
+#loader{position:fixed;inset:0;background:#fff;z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--ink2);padding:20px}
 </style>
 </head>
 <body>
 <div class="netbar" id="netbar"></div>
 <div id="loader"><div style="font-size:28px">🗓</div><div id="loaderTxt">กำลังโหลด...</div></div>
-
-<header>
-  <div class="top">
-    <h1><span id="coName">SGQ</span> <span style="font-weight:400;font-size:13px" data-i="appTitle">ตารางงานทีมช่าง</span><span class="live" id="live"></span></h1>
-    <div class="who" id="who"></div>
-    <button class="lang" id="langBtn" onclick="toggleLang()">မြန်မာ</button>
-  </div>
-  <div class="tabs">
-    <button data-v="day" class="on" onclick="setView('day')" data-i="day">วัน</button>
-    <button data-v="week" onclick="setView('week')" data-i="week">สัปดาห์</button>
-    <button data-v="month" onclick="setView('month')" data-i="month">เดือน</button>
-  </div>
-</header>
-<div class="nav">
-  <button onclick="nav(-1)">‹</button>
-  <div class="lbl" id="navLbl"></div>
-  <button onclick="nav(1)">›</button>
-  <button onclick="goToday()" data-i="today">วันนี้</button>
+<div class="app">
+  <header class="top">
+    <div class="logo">SGQ</div>
+    <div style="min-width:0"><div class="t1"><span data-i="appTitle">ตารางงานทีมช่าง</span><span class="live" id="live"></span></div><div class="t2" id="todayLbl"></div></div>
+    <div class="sp"></div>
+    <span id="coName" hidden>SGQ</span>
+    <button class="langbtn" id="langBtn" onclick="toggleLang()">မြန်မာ</button>
+    <button class="meav" id="who" onclick="go('menu')"></button>
+  </header>
+  <main id="main"></main>
 </div>
-<div class="chips" id="chips"></div>
-<main id="main"></main>
-
-<div class="fab" id="fab">
-  <button class="mini" onclick="openExport()" data-i="export">ส่งออกสัปดาห์นี้ (PDF/Excel)</button>
-  <button class="mini adm" id="fabLeave" onclick="openLeave()" data-i="addLeave">ลงวันลา/หยุด</button>
-  <button class="mini adm" id="fabHol" onclick="openHoliday()" data-i="addHoliday">วันหยุดบริษัท</button>
-  <button class="mini adm" id="fabWorker" onclick="openWorker()" data-i="manageWorkers">เพิ่ม/แก้ช่าง</button>
-  <button class="mini adm" id="fabCast" onclick="openBroadcast()" data-i="broadcast">📢 บอร์ดแคสต์เข้ากลุ่ม</button>
-  <button class="mini adm" id="fabJob" onclick="openJob()" data-i="addJob">+ ลงงาน</button>
-  <button class="main" onclick="document.getElementById('fab').classList.toggle('open')">＋</button>
-</div>
-
+<nav class="bnav" id="bnav"></nav>
 <div class="ov" id="ov" onclick="if(event.target===this)closeModal()"><div class="sheet" id="sheet"></div></div>
 <div class="toast" id="toast"></div>
 
@@ -309,7 +456,7 @@ function callVersion(){
 function noteVersion(r){ if (r && r.version != null) S.version = r.version; }   // หลังเขียนสำเร็จ: ไม่ต้องโหลดซ้ำเพราะ state ในเครื่องตรงแล้ว
 function upsertLocal(list, key, obj){ const i = list.findIndex(x => x[key] === obj[key]); if (i < 0) list.push(obj); else list[i] = obj; }
 function step(m){ const el = document.getElementById('loaderTxt'); if (el) el.textContent = m; }
-function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; setTimeout(()=>t.style.display='none', 2200); }
+function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.style.display='block'; clearTimeout(t._h); t._h = setTimeout(()=>t.style.display='none', 2200); }
 
 /* ================== อัพเดตหน้าแอปอัตโนมัติ ==================
    GitHub Pages ให้แคช HTML 10 นาที (เบราว์เซอร์ใน LINE อาจนานกว่า) → อัพเดตแล้วช่างยังเห็นหน้าเก่า
@@ -317,7 +464,7 @@ function toast(msg){ const t = document.getElementById('toast'); t.textContent =
    → โหลดใหม่ด้วย ?v=<build> (URL ใหม่ = ไม่โดนแคช) · ไม่โหลดใหม่ขณะมีการบันทึกค้าง/เปิดฟอร์มอยู่ (ลองใหม่รอบหน้า)
    · กันวนด้วย sessionStorage (โหลดใหม่ได้ครั้งเดียวต่อ build) · เช็กเฉพาะบน github.io (demo/Apps Script ข้าม)
    **แก้ index.html แล้วต้องเปลี่ยน APP_BUILD ทุกครั้ง** ไม่งั้นเครื่องที่ติดแคชจะไม่รู้ว่ามีของใหม่ */
-const APP_BUILD = '2026-10-11.1';
+const APP_BUILD = '2026-10-11.2';   // UI v2
 let updChecking = false, updLast = 0;
 async function checkAppUpdate(){
   if (!/\.github\.io$/.test(location.hostname)) return;
@@ -419,13 +566,6 @@ function loadCache(){
     return o;
   } catch(e) { return null; }
 }
-function renderWho(){
-  const w = document.getElementById('who');
-  w.innerHTML = S.isAdmin ? `<b>ADMIN</b><br>${esc(S.displayName)}` : (S.user ? `<b>${esc(wName(S.user))}</b><br>${esc(S.user.team||'')}` : esc(S.displayName));
-}
-function setupFab(){
-  document.getElementById('fab').classList.toggle('noadmin', !S.isAdmin);
-}
 let pollBusy = false;
 async function pollVersion(){
   if (pollBusy || writesInFlight) return;      // กำลังบันทึกอยู่ → ไม่รีเฟรชทับ state ที่เพิ่งแก้ในเครื่อง
@@ -442,7 +582,7 @@ async function pollVersion(){
 const RANGE_BACK = 35, RANGE_FWD = 70;   // โหลดกว้างกว่าที่ดู จะได้เลื่อนดูได้โดยไม่ต้องรอเซิร์ฟเวอร์
 function viewRange(){
   const c = S.cursor;
-  if (S.view === 'day') return [c, c];
+  if (S.view === 'day' || S.view === 'menu') return [c, c];
   if (S.view === 'week') { const ws = weekStart(c); return [ws, addDays(ws, 6)]; }
   const d = parse(c); const first = ymd(new Date(d.getFullYear(), d.getMonth(), 1));
   const gridStart = weekStart(first); return [gridStart, addDays(gridStart, 41)];
@@ -481,7 +621,7 @@ function loadRange(force){
 function viewCovered(){ const [a,b] = viewRange(); return !!(S.loaded.from && S.loaded.from <= a && S.loaded.to >= b); }
 
 /* ================== view / nav ================== */
-function setView(v){ S.view = v; document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); loadRange(false); }
+function setView(v){ S.view = v; loadRange(false); }
 function nav(n){
   if (S.view === 'day') S.cursor = addDays(S.cursor, n);
   else if (S.view === 'week') S.cursor = addDays(S.cursor, 7*n);
@@ -489,7 +629,7 @@ function nav(n){
   loadRange(false);
 }
 function goToday(){ S.cursor = S.today; loadRange(false); }
-function gotoDay(s){ S.cursor = s; setView('day'); }
+function gotoDay(s){ S.cursor = s; setView('day'); window.scrollTo(0,0); }
 
 /* ================== filters ================== */
 function jobsOn(dateStr){
@@ -502,29 +642,10 @@ function applyFilter(j){
   if (S.filter.startsWith('team:')) return j.team === S.filter.slice(5) || ids.some(id => (S.workers.find(w=>w.worker_id===id)||{}).team === S.filter.slice(5));
   return true;
 }
-function renderChips(){
-  const teams = [...new Set(S.workers.map(w => w.team).filter(Boolean))];
-  let h = `<button class="chip ${S.filter==='all'?'on':''}" onclick="setFilter('all')">${T('all')}</button>`;
-  if (S.user) h += `<button class="chip ${S.filter==='me'?'on':''}" onclick="setFilter('me')">${T('myJobs')}</button>`;
-  teams.forEach(t => h += `<button class="chip ${S.filter==='team:'+t?'on':''}" onclick="setFilter('team:${esc(t)}')">${esc(t)}</button>`);
-  document.getElementById('chips').innerHTML = h;
-}
 function setFilter(f){ S.filter = f; render(); }
 
-/* ================== render ================== */
-function fixNavTop(){ const h = document.querySelector('header'), n = document.querySelector('.nav'); if (h && n) n.style.top = h.offsetHeight + 'px'; }
-window.addEventListener('resize', fixNavTop);
-function render(){
-  fixNavTop(); renderChips();
-  const lbl = document.getElementById('navLbl');
-  const m = document.getElementById('main');
-  const pre = (!viewCovered() && rangeReq) ? `<div class="banner">⏳ ${T('loading')}</div>` : '';
-  if (S.view === 'day'){ lbl.textContent = fmtLong(S.cursor); m.innerHTML = pre + renderDay(S.cursor); }
-  else if (S.view === 'week'){ const ws = weekStart(S.cursor); lbl.textContent = `${fmt(ws)} – ${fmt(addDays(ws,6))}`; m.innerHTML = pre + renderWeek(ws); }
-  else { const d = parse(S.cursor); lbl.textContent = `${T('monthsFull')[d.getMonth()]} ${d.getFullYear()+543}`; m.innerHTML = pre + renderMonth(d); }
-}
+/* ================== ช่าง / สีโปรเจกต์ / เช็คอิน ================== */
 const worker = id => S.workers.find(w => w.worker_id === id);
-const typeColor = t => `var(--t-${t}, #475569)`;
 /* ===== สีตามโปรเจกต์: งานโปรเจกต์เดียวกันสีเดียวกันทุกวัน/ทุกมุมมอง, ต่างโปรเจกต์ต่างสี (คละแบบสุ่มแต่คงที่) =====
    ชื่อ "บ้านคุณหมวย" = "คุณหมวย", "หมู่บ้านเอสเคฟ" = "หมู่เอสเคฟ" (ตัดคำนำหน้า/ช่องว่าง/สระซ้ำ)
    เลือกสีจาก hash ของชื่อ ชนกับโปรเจกต์อื่นที่โหลดอยู่ → เลื่อนไปสีถัดไปที่ยังว่าง (ทุกสีอ่านตัวอักษรขาวได้) */
@@ -557,147 +678,381 @@ function checkinState(w){
     (w.line_user_id && S.checkins.userIds.includes(w.line_user_id)) || S.checkins.names.includes(w.name_th);
   return ok ? 'ci' : 'nci';
 }
-function peopleHtml(ids, showCheckin){
-  return `<div class="ppl">` + ids.split(',').map(s=>s.trim()).filter(Boolean).map(id => {
-    const w = worker(id); if (!w) return `<span>${esc(id)}</span>`;
-    const cs = showCheckin ? checkinState(w) : '';
-    const me = S.user && S.user.worker_id === id ? ' me' : '';
-    return `<span class="${cs}${me}" title="${cs==='ci'?T('checkedIn'):cs==='nci'?T('notCheckedIn'):''}">${cs==='ci'?'✅ ':cs==='nci'?'⏳ ':''}${esc(wName(w))}</span>`;
-  }).join('') + `</div>`;
+
+/* ================== UI v2: ข้อความเพิ่ม (ไทย/พม่า) ================== */
+Object.assign(I18N.th, {
+  menu:'เมนู', jobsN:'งาน', inprog:'กำลังทำ', doneN:'เสร็จ', dayOf:'วันที่', nav:'นำทาง', seeNext:'ดูงานวันทำงานถัดไป',
+  onLeave:'ลา', leaveClash:'ลา แต่มีงาน', unassigned:'ยังไม่ระบุช่าง', projects:'โปรเจกต์เดือนนี้', people:'คน',
+  menuAdmin:'จัดการ', menuGen:'ทั่วไป', bcSub:'ส่งสรุปงานวันนี้ / พรุ่งนี้ / สัปดาห์', leaveSub:'ระบบเตือนถ้าช่างที่ลามีงานชน',
+  holSub:'เพิ่มวันหยุดนอกจากวันอาทิตย์', workersSub:'เพิ่ม / แก้ไข / ปิดใช้งาน', exportSub:'ตารางสัปดาห์ สำหรับลูกค้า / ติดบอร์ด',
+  langSet:'ภาษา / ဘာသာ', admin:'แอดมิน', tapPhoto:'แตะเพื่อถ่ายรูป / เลือกรูป', needCust:'ใส่ชื่อลูกค้า/โครงการ และวันเริ่มก่อน',
+  leaveSaved:'บันทึกวันลาแล้ว', clashWarn:'มีงานชนวันลา', job:'งาน', teamPre:'ทีม', del2:'ลบงาน', edit:'แก้ไข',
+  confirm:'ยืนยัน', delLeaveQ:'ลบวันลานี้?', register2:'เลือกชื่อของคุณ',
+  bnDay:'วัน', bnWeek:'สัปดาห์', bnMonth:'เดือน'
+});
+Object.assign(I18N.th.statuses, { planned:'รอเริ่ม' });
+Object.assign(I18N.mm, {
+  menu:'မီနူး', jobsN:'အလုပ်', inprog:'လုပ်နေဆဲ', doneN:'ပြီး', dayOf:'ရက်', nav:'လမ်းညွှန်', seeNext:'နောက်အလုပ်ရက် ကြည့်',
+  onLeave:'ခွင့်', leaveClash:'ခွင့်ယူ သို့သော် အလုပ်ရှိ', unassigned:'ဆရာ မသတ်မှတ်ရသေး', projects:'ဒီလ ပရောဂျက်များ', people:'ယောက်',
+  menuAdmin:'စီမံ', menuGen:'အထွေထွေ', bcSub:'ဒီနေ့ / မနက်ဖြန် / အပတ် အကျဉ်း', leaveSub:'အလုပ်ထပ်လျှင် သတိပေး',
+  holSub:'တနင်္ဂနွေမှလွဲ၍ ပိတ်ရက်', workersSub:'ထည့် / ပြင် / ပိတ်', exportSub:'အပတ်စဉ်ဇယား',
+  langSet:'ภาษา / ဘာသာ', admin:'အက်ဒမင်', tapPhoto:'ဓာတ်ပုံရိုက်ရန် နှိပ်ပါ', needCust:'ဖောက်သည်အမည်နှင့် စတင်ရက် ထည့်ပါ',
+  leaveSaved:'ခွင့်ရက် သိမ်းပြီး', clashWarn:'ခွင့်ရက်တွင် အလုပ်ရှိ', job:'အလုပ်', teamPre:'', del2:'အလုပ်ဖျက်', edit:'ပြင်',
+  confirm:'အတည်ပြု', delLeaveQ:'ဤခွင့်ကို ဖျက်မလား?', register2:'သင့်နာမည်ရွေးပါ',
+  bnDay:'နေ့', bnWeek:'အပတ်', bnMonth:'လ'
+});
+const TYPE_IC = {'วัดหน้างาน':'📏','ตัดประกอบ':'🪚','ติดตั้ง':'🔧','แก้งาน':'🛠️','ส่งมอบ':'🤝'};
+const teamLabel = t => lang === 'th' ? 'ทีม' + t : ((T('types')[t] || t) + ' အဖွဲ့');
+
+/* ================== ช่าง: สี / ตัวอักษรย่อ / เช็คอิน ================== */
+const W_COLORS = ['#0f766e','#1d4ed8','#c2410c','#15803d','#7c3aed','#be185d','#a16207','#0e7490','#4338ca','#b91c1c','#4d7c0f','#9333ea'];
+function wColor(w){ const i = S.workers.findIndex(x => x.worker_id === w.worker_id); return W_COLORS[(i < 0 ? hashStr(w.worker_id) : i) % W_COLORS.length]; }
+function wInitial(w){ const n = String(w.name_th || '?').replace(/^ช่าง/, '') || String(w.name_th || '?'); return /^[เแโใไ]/.test(n) ? n.slice(0, 2) : n.slice(0, 1); }
+const asgIds = j => String(j.assignees || '').split(',').map(s => s.trim()).filter(Boolean);
+const isMine = j => !!(S.user && asgIds(j).includes(S.user.worker_id));
+const leaveOf = (wid, d) => S.leaves.find(l => l.worker_id === wid && l.date_from <= d && l.date_to >= d);
+// สถานะต่อวัน: lv = ลา, in = เช็คอินแล้ว, wait = ยังไม่เช็คอิน (เฉพาะวันนี้ และต่อระบบเช็คอินได้), '' = ไม่แสดง
+function ciState(wid, d){
+  if (leaveOf(wid, d)) return 'lv';
+  if (d !== S.today) return '';
+  const w = worker(wid); if (!w) return '';
+  const s = checkinState(w); return s === 'ci' ? 'in' : s === 'nci' ? 'wait' : '';
 }
-function renderDay(ds){
-  const hol = holidayOf(ds);
-  const jobs = jobsOn(ds);
-  const leaves = S.leaves.filter(l => l.date_from <= ds && l.date_to >= ds);
-  const isToday = ds === S.today;
-  let h = '';
-  if (hol) h += `<div class="banner">🎌 ${T('holiday')}: ${esc(hol.name)}</div>`;
-  if (leaves.length) h += `<div class="leaveline">🏖 ${T('leave')}: ` + leaves.map(l => { const w = worker(l.worker_id); return `${esc(w?wName(w):l.worker_id)} (${esc(l.type)})` + (S.isAdmin ? ` <a href="#" onclick="delLeave('${l.leave_id}');return false;">✕</a>` : ''); }).join(', ') + `</div>`;
-  if (!jobs.length) h += `<div class="empty">${T('noJobs')}</div>`;
-  jobs.forEach(j => h += jobCard(j, isToday));
+function avatar(wid, d, sm){
+  const w = worker(wid); if (!w) return `<span class="av${sm?' sm':''}" style="background:#94a3b8">?</span>`;
+  const s = d ? ciState(wid, d) : '';
+  const ring = s ? `<span class="ring ${s}">${s==='in'?'✓':s==='lv'?'–':''}</span>` : '';
+  const me = S.user && S.user.worker_id === wid ? ' me' : '';
+  return `<span class="av${sm?' sm':''}${me}" style="background:${wColor(w)}" title="${esc(wName(w))}">${esc(wInitial(w))}${ring}</span>`;
+}
+const wNames = j => asgIds(j).map(id => { const w = worker(id); return w ? wName(w) : id; }).join(', ');
+
+/* ================== shell: หัว + แถบเมนูล่าง ================== */
+const ICONS = {
+  day:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="12" cy="15.5" r="1.6" fill="currentColor"/></svg>',
+  week:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h10M4 12h16M4 18h7"/></svg>',
+  month:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M3 9h18M9 9v12M15 9v12M3 15h18"/></svg>',
+  menu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg>',
+  l:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  r:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg>',
+};
+function renderWho(){
+  const el = document.getElementById('who'); if (!el) return;
+  if (S.user && !S.isAdmin){ el.textContent = wInitial(S.user); el.style.background = wColor(S.user); el.style.color = '#fff'; }
+  else { el.textContent = S.isAdmin ? 'A' : (S.displayName || '?').slice(0,1); el.style.background = '#fff'; el.style.color = 'var(--brand)'; }
+  el.title = S.isAdmin ? T('admin') + ' · ' + (S.displayName || '') : (S.user ? wName(S.user) : (S.displayName || ''));
+}
+function setupFab(){ renderNav(); }
+function renderNav(){
+  const nb = (v, k) => `<button class="nb ${S.view===v?'on':''}" onclick="go('${v}')">${ICONS[v]}<span>${T(k)}</span></button>`;
+  const nav = document.getElementById('bnav');
+  nav.className = 'bnav' + (S.isAdmin ? '' : ' nofab');
+  nav.innerHTML = nb('day','bnDay') + nb('week','bnWeek') + (S.isAdmin ? `<div class="fab"><button onclick="openJob()" aria-label="${esc(T('newJob'))}">＋</button></div>` : '') + nb('month','bnMonth') + nb('menu','menu');
+}
+function go(v){ if (v === S.view && v !== 'menu') { window.scrollTo(0,0); return; } setView(v); window.scrollTo(0,0); }
+function dayWeek(n){ S.cursor = addDays(S.cursor, 7*n); loadRange(false); }
+
+/* ================== render ================== */
+function render(){
+  const tl = document.getElementById('todayLbl'); if (tl && S.today) tl.textContent = T('today') + ' · ' + fmtLong(S.today);
+  renderNav(); renderWho();
+  const m = document.getElementById('main'); if (!m || !S.cursor) return;
+  const pre = (S.view !== 'menu' && !viewCovered() && rangeReq) ? `<div class="loadline">⏳ ${T('loading')}</div>` : '';
+  m.innerHTML = pre + (S.view === 'day' ? viewDay() : S.view === 'week' ? viewWeek() : S.view === 'month' ? viewMonth() : viewMenu());
+}
+function chipsHtml(){
+  const c = (f, label) => `<button class="chip ${S.filter===f?'on':''}" onclick="setFilter('${esc(f)}')">${esc(label)}</button>`;
+  const teams = [...new Set(S.workers.map(w => w.team).filter(Boolean))];
+  return `<div class="chips">${c('all',T('all'))}${S.user?c('me',T('myJobs')):''}${teams.map(t => c('team:'+t, teamLabel(t))).join('')}</div>`;
+}
+const pc = j => projColor(j);
+const shortD = s => { const d = parse(s); return `${d.getDate()} ${T('months')[d.getMonth()]}`; };
+const isOffDay = s => !!holidayOf(s);
+
+/* ---------- วัน ---------- */
+function viewDay(){
+  const d = S.cursor, ws = weekStart(d), dt = parse(d);
+  let h = `<div class="shead"><h2>${T('monthsFull')[dt.getMonth()]} ${dt.getFullYear()+543}</h2>
+    ${d!==S.today?`<button class="todaybtn" onclick="goToday()">${T('today')}</button>`:''}
+    <button class="navbtn" onclick="dayWeek(-1)">${ICONS.l}</button><button class="navbtn" onclick="dayWeek(1)">${ICONS.r}</button></div>`;
+  h += '<div class="strip">';
+  for (let i = 0; i < 7; i++){
+    const x = addDays(ws, i), js = jobsOn(x).filter(j => j.status !== 'cancelled');
+    const dots = [...new Set(js.map(pc))].slice(0,3).map(c => `<i style="background:${c}"></i>`).join('');
+    h += `<button class="sday ${isOffDay(x)?'off':''} ${x===S.today?'today':''} ${x===d?'sel':''}" onclick="pickDay('${x}')">
+      <span class="dn">${T('days')[dow(x)]}</span><span class="dd">${parse(x).getDate()}</span><span class="dots">${dots}</span></button>`;
+  }
+  h += '</div>';
+
+  const all = S.jobs.filter(j => j.start_date <= d && j.end_date >= d && showOn(j, d) && j.status !== 'cancelled');
+  const hol = holidayOf(d);
+  const leaves = S.leaves.filter(l => l.date_from <= d && l.date_to >= d);
+  if (hol && !all.length){
+    let nx = addDays(d,1); for (let k = 0; k < 14 && holidayOf(nx); k++) nx = addDays(nx,1);
+    return h + `<div class="offcard"><div class="big">${hol.weekly?'🌴':'🎌'}</div><b>${esc(hol.weekly?T('weeklyOff'):hol.name)}</b><div>${fmtLong(d)}</div>
+      ${S.isAdmin && !hol.weekly ? `<div style="margin-top:8px"><a href="#" onclick="openHoliday('${d}');return false">${T('edit')}</a></div>` : ''}
+      <button class="btn primary" style="margin:14px auto 0;padding:10px 18px" onclick="pickDay('${nx}')">${T('seeNext')} →</button></div>`;
+  }
+  if (hol) h += `<div class="holline">🎌 ${esc(hol.weekly?T('weeklyOff'):hol.name)}</div>`;
+
+  const busy = [...new Set(all.flatMap(asgIds))];
+  const leaverIds = [...new Set(leaves.map(l => l.worker_id))];
+  const clash = leaverIds.filter(id => busy.includes(id));
+  const crewIds = [...new Set([...busy, ...leaverIds])].filter(id => worker(id));
+  h += `<div class="summary"><div class="stats">
+      <div class="stat"><b>${all.length}</b><span>${T('jobsN')}</span></div>
+      <div class="stat prog"><b>${all.filter(j=>j.status==='in_progress').length}</b><span>${T('inprog')}</span></div>
+      <div class="stat done"><b>${all.filter(j=>j.status==='done').length}</b><span>${T('doneN')}</span></div></div>
+    ${crewIds.length ? `<div class="crewrow">${crewIds.map(id => `<div class="cw">${avatar(id, d)}<span>${esc(wName(worker(id)))}</span></div>`).join('')}</div>` : ''}
+    ${leaves.length ? `<div class="leaveline">🏖 ${T('leave')}: ${leaves.map(l => { const w = worker(l.worker_id);
+        return `${esc(w?wName(w):l.worker_id)} (${esc(l.type)})` + (S.isAdmin ? ` <a href="#" onclick="delLeave('${esc(l.leave_id)}');return false" aria-label="${esc(T('del'))}">✕</a>` : ''); }).join(', ')}</div>` : ''}
+    ${clash.length ? `<div class="warnline">⚠ ${clash.map(id => esc(wName(worker(id)))).join(', ')} — ${T('leaveClash')}</div>` : ''}</div>`;
+  h += chipsHtml();
+  const js = all.filter(applyFilter).sort((a,b) => (isMine(b)-isMine(a)) || (a.start_time||'99').localeCompare(b.start_time||'99'));
+  if (!js.length) h += `<div class="empty"><div class="big">🗓️</div>${T('noJobs')}</div>`;
+  js.forEach(j => h += jobCard(j, d));
   return h;
 }
-function jobCard(j, showCheckin){
-  const multi = j.start_date !== j.end_date;
-  const canWork = S.user && (j.assignees||'').split(',').map(s=>s.trim()).includes(S.user.worker_id);
-  let acts = '';
-  if (j._pending) acts = `<span class="pend">⏳ ${T('saving')}</span>`;   // กำลังส่งขึ้นเซิร์ฟเวอร์ — ยังกดต่อไม่ได้
-  else {
-    if ((canWork || S.isAdmin) && j.status === 'planned') acts += `<button class="btn w sm" onclick="setStatus('${j.job_id}','in_progress')">🔧 ${T('start')}</button>`;
-    if ((canWork || S.isAdmin) && ['planned','in_progress'].includes(j.status)) acts += `<button class="btn g sm" onclick="openFinish('${j.job_id}')">✅ ${T('finish')}</button>`;
-    if (S.isAdmin) acts += `<button class="btn sm" onclick="openJob('${j.job_id}')">✏️</button><button class="btn d sm" onclick="delJob('${j.job_id}')">🗑</button>`;
-  }
-  const photos = (j.done_photos||'').split('|').filter(Boolean);
-  const atts = (j.attachments||'').split('|').filter(Boolean);
-  return `<div class="card ${j.status==='done'?'done':''}" style="border-left:6px solid ${projColor(j)}">
-    <div class="row"><span class="badge" style="background:${projColor(j)}">${esc(T('types')[j.job_type]||j.job_type)}</span>
-      ${j.start_time?`<b>⏱ ${esc(j.start_time)}</b>`:''}<span style="flex:1"></span>
-      <span class="st" style="background:var(--${j.status})">${esc(T('statuses')[j.status]||j.status)}</span></div>
-    <div class="title">${esc(j.customer)}</div>
-    <div class="meta">
-      ${multi?`📅 ${fmt(j.start_date)} – ${fmt(j.end_date)}<br>`:''}
-      ${j.due_date?`⏰ ${T('dueDate')} ${fmt(j.due_date)}<br>`:''}
-      ${j.address?`📍 ${esc(j.address)} `:''}${j.map_url?`<a href="${esc(j.map_url)}" target="_blank" rel="noopener">🗺 ${T('map')}</a>`:''}
-      ${j.detail?`<br>📝 ${esc(j.detail).replace(/\n/g,'<br>')}`:''}
-      ${j.note?`<br>💬 ${esc(j.note)}`:''}
-      ${j.team?`<br>👥 ${esc(j.team)}`:''}
-    </div>
-    ${peopleHtml(j.assignees, showCheckin)}
-    ${atts.length?`<div class="thumbs">${atts.map((u,i)=>/\.(jpe?g|png|gif|webp)|uc\?export|drive\.google\.com\/thumbnail/i.test(u)?`<a href="${esc(u)}" target="_blank"><img src="${esc(u)}"></a>`:`<a href="${esc(u)}" target="_blank">📎 ${T('attachments')} ${i+1}</a>`).join('')}</div>`:''}
-    ${photos.length?`<div class="meta" style="margin-top:6px">${T('photos')}</div><div class="thumbs">${photos.map(u=>`<a href="${esc(u)}" target="_blank"><img src="${esc(u)}"></a>`).join('')}</div>`:''}
-    ${acts?`<div class="acts">${acts}</div>`:''}
-  </div>`;
+function pickDay(x){ S.cursor = x; if (S.view !== 'day') setView('day'); else loadRange(false); }
+function actionsHtml(j, inModal){
+  if (j._pending) return `<div class="pend">⏳ ${T('saving')}</div>`;
+  const can = S.isAdmin || isMine(j);
+  if (!can) return '';
+  if (j.status === 'planned') return `<div class="acts"><button class="btn start" onclick="setStatus('${j.job_id}','in_progress')">▶ ${T('start')}</button><button class="btn finish" onclick="openFinish('${j.job_id}')">✓ ${T('finish')}</button></div>`;
+  if (j.status === 'in_progress' || (inModal && j.status === 'postponed')) return `<div class="acts one"><button class="btn finish" onclick="openFinish('${j.job_id}')">📷 ${T('finish')}</button></div>`;
+  return '';
 }
-function renderWeek(ws){
-  const days = []; for (let i=0;i<7;i++) days.push(addDays(ws,i));
-  let h = `<div class="wk"><table class="wk-t"><tr><th>${T('worker')}</th>`;
-  days.forEach(d => { const hol = holidayOf(d); h += `<th class="${d===S.today?'today':''} ${hol?'hol':''}" onclick="gotoDay('${d}')">${fmt(d,true)}${hol?`<br><small>🎌 ${esc(hol.name)}</small>`:''}</th>`; });
-  h += '</tr>';
-  const ws_ = S.workers.filter(w => S.filter==='me' ? (S.user && w.worker_id===S.user.worker_id) : S.filter.startsWith('team:') ? w.team===S.filter.slice(5) : true);
-  ws_.forEach(w => {
-    h += `<tr><td>${esc(wName(w))}<br><small style="color:#64748b">${esc(w.team||'')}</small></td>`;
-    days.forEach(d => {
-      const hol = holidayOf(d);
-      let c = '';
-      S.leaves.filter(l => l.worker_id===w.worker_id && l.date_from<=d && l.date_to>=d).forEach(l => c += `<span class="cell-chip lv">🏖 ${esc(l.type)}</span>`);
-      S.jobs.filter(j => j.start_date<=d && j.end_date>=d && showOn(j, d) && (j.assignees||'').split(',').map(s=>s.trim()).includes(w.worker_id) && j.status!=='cancelled')
-        .sort((a,b)=>(a.start_time||'99').localeCompare(b.start_time||'99'))
-        .forEach(j => c += `<span class="cell-chip ${j.status==='done'?'done':''}" style="background:${projColor(j)}" onclick="openDetail('${j.job_id}')">${j.start_time?j.start_time+' ':''}${esc(j.customer)}</span>`);
-      h += `<td class="${d===S.today?'today':''} ${hol?'hol':''}">${c}</td>`;
-    });
-    h += '</tr>';
-  });
-  // งานที่ยังไม่ได้มอบหมายคน
-  const un = days.map(d => S.jobs.filter(j => j.start_date<=d && j.end_date>=d && showOn(j, d) && !(j.assignees||'').trim() && j.status!=='cancelled'));
-  if (un.some(a=>a.length)){
-    h += `<tr><td>❓</td>` + un.map((a,i)=>`<td class="${days[i]===S.today?'today':''}">${a.map(j=>`<span class="cell-chip" style="background:${projColor(j)}" onclick="openDetail('${j.job_id}')">${esc(j.customer)}</span>`).join('')}</td>`).join('') + '</tr>';
-  }
-  return h + '</table></div>';
+function addrHtml(j){
+  if (!j.address && !j.map_url) return '';
+  const url = j.map_url || ('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(j.address));
+  return `<div class="addr">📍 <span>${esc(j.address || '')}</span><a class="go" href="${esc(url)}" target="_blank" rel="noopener">🧭 ${T('nav')}</a></div>`;
 }
-function renderMonth(d){
-  const first = ymd(new Date(d.getFullYear(), d.getMonth(), 1));
-  const gs = weekStart(first);
-  let h = `<div class="mo">` + WEEK_ORDER.map(i=>`<div class="h">${T('days')[i]}</div>`).join('');
-  for (let i=0;i<42;i++){
-    const ds = addDays(gs,i); const dd = parse(ds);
-    const out = dd.getMonth() !== d.getMonth();
-    const hol = holidayOf(ds);
-    const jobs = jobsOn(ds).filter(j=>j.status!=='cancelled');
-    const lv = S.leaves.filter(l => l.date_from<=ds && l.date_to>=ds);
-    let c = `<div class="d ${out?'out':''} ${ds===S.today?'today':''} ${hol?'hol':''}" onclick="gotoDay('${ds}')"><span class="n">${dd.getDate()}</span>`;
-    if (hol && !hol.weekly) c += `<span class="dot" style="background:#e11d48">🎌 ${esc(hol.name)}</span>`;
-    jobs.slice(0,3).forEach(j => c += `<span class="dot" style="background:${projColor(j)};${j.status==='done'?'opacity:.5':''}" onclick="event.stopPropagation();openDetail('${j.job_id}')">${esc(j.customer)}</span>`);
-    if (jobs.length>3) c += `<span class="more">+${jobs.length-3}</span>`;
-    if (lv.length) c += `<div class="lvn">🏖 ${lv.length}</div>`;
-    h += c + '</div>';
-  }
-  return h + '</div>';
+function jobCard(j, d){
+  const n = Math.round((parse(j.end_date) - parse(j.start_date)) / 864e5) + 1, k = Math.round((parse(d) - parse(j.start_date)) / 864e5) + 1;
+  return `<article class="job ${j.status==='done'?'isdone':''}" style="--pc:${pc(j)}" onclick="if(!event.target.closest('button,a'))openDetail('${j.job_id}')">
+    ${isMine(j) && S.filter !== 'me' ? `<span class="mine-tag">${T('myJobs')}</span>` : ''}
+    <div class="row1"><span class="type">${TYPE_IC[j.job_type]||''} ${esc(T('types')[j.job_type]||j.job_type)}</span>${j.start_time?`<span class="time">${esc(j.start_time)}</span>`:''}
+      <span class="st st-${esc(j.status)}">${esc(T('statuses')[j.status]||j.status)}</span></div>
+    <h3>${esc(j.customer)}</h3>
+    ${n>1?`<div class="spanline"><b>${T('dayOf')} ${k}/${n}</b> · ${shortD(j.start_date)} – ${shortD(j.end_date)}</div>`:''}
+    ${j.detail?`<p class="detail">${esc(j.detail)}</p>`:''}
+    ${j.note?`<p class="note">💬 ${esc(j.note)}</p>`:''}
+    ${addrHtml(j)}
+    <div class="crew">${asgIds(j).map(id => avatar(id, d, true)).join('')}<span class="names">${esc(wNames(j) || T('unassigned'))}</span></div>
+    ${actionsHtml(j)}</article>`;
 }
 
-/* ================== modals ================== */
+/* ---------- สัปดาห์ (แท่งต่อเนื่องแบบ Gantt) ---------- */
+function lanes(items){   // ใส่ lane ไม่ให้แท่งทับกัน (items: {a,b} = index วันในสัปดาห์)
+  const end = []; items.sort((x,y) => x.a - y.a || (y.b-y.a) - (x.b-x.a));
+  items.forEach(it => { let L = end.findIndex(e => e < it.a); if (L < 0){ L = end.length; end.push(-1); } end[L] = it.b; it.lane = L; });
+  return Math.max(1, end.length);
+}
+// ช่วงวันของงานในสัปดาห์ ws: ตัดวันอาทิตย์ท้ายสัปดาห์ออกตามกติกา showOn (ยกเว้นงานเริ่มวันอาทิตย์เอง)
+function segOf(j, ws){
+  let a = Math.max(0, Math.round((parse(j.start_date) - parse(ws)) / 864e5));
+  let b = Math.min(6, Math.round((parse(j.end_date) - parse(ws)) / 864e5));
+  if (b === 6 && !showOn(j, addDays(ws, 6))) b = 5;
+  return b >= a ? { a, b } : null;
+}
+function viewWeek(){
+  const ws = weekStart(S.cursor), we = addDays(ws,6);
+  let h = `<div class="shead"><h2>${shortD(ws)} – ${shortD(we)}</h2>
+    ${weekStart(S.today)!==ws?`<button class="todaybtn" onclick="goToday()">${T('today')}</button>`:''}
+    <button class="navbtn" onclick="nav(-1)">${ICONS.l}</button><button class="navbtn" onclick="nav(1)">${ICONS.r}</button></div>`;
+  h += chipsHtml();
+  h += `<div class="gwrap"><div class="ghead"><div class="corner">${T('worker')}</div>`;
+  for (let i = 0; i < 7; i++){ const x = addDays(ws,i), hol = holidayOf(x);
+    h += `<div class="${hol?'off':''} ${x===S.today?'today':''}" onclick="pickDay('${x}')">${T('days')[dow(x)]}<b>${parse(x).getDate()}</b>${hol && !hol.weekly ? `<small>${esc(hol.name)}</small>` : ''}</div>`; }
+  h += '</div>';
+  let list = S.workers;
+  if (S.filter === 'me' && S.user) list = S.workers.filter(w => w.worker_id === S.user.worker_id);
+  else if (S.filter.startsWith('team:')) list = S.workers.filter(w => w.team === S.filter.slice(5));
+  const live = S.jobs.filter(j => j.status !== 'cancelled' && j.end_date >= ws && j.start_date <= we);
+  const rowHtml = (label, items) => {
+    const L = Math.max(2, lanes(items));
+    let r = `<div class="wrow" style="grid-template-rows:repeat(${L},32px)"><div class="wname" style="grid-row:1/${L+1}">${label}</div>`;
+    for (let i = 0; i < 7; i++){ const x = addDays(ws,i); r += `<div class="gcell ${holidayOf(x)?'off':''} ${x===S.today?'today':''}" style="grid-column:${i+2};grid-row:1/${L+1}"></div>`; }
+    items.forEach(it => {
+      const pos = `grid-column:${it.a+2}/${it.b+3};grid-row:${it.lane+1}`;
+      if (it.lv) r += `<div class="bar leave" style="${pos}"><span>🏖 ${esc(it.lv.type || T('onLeave'))}</span></div>`;
+      else {
+        const clash = items.some(o => o.lv && o.a <= it.b && o.b >= it.a);
+        r += `<button class="bar ${it.j.status==='done'?'isdone':''} ${clash?'clash':''}" style="${pos};background:${pc(it.j)}" onclick="openDetail('${it.j.job_id}')"><span>${TYPE_IC[it.j.job_type]||''} ${esc(it.j.customer)}</span></button>`;
+      }
+    });
+    return r + '</div>';
+  };
+  list.forEach(w => {
+    const items = [];
+    live.filter(j => asgIds(j).includes(w.worker_id)).forEach(j => { const s = segOf(j, ws); if (s) items.push(Object.assign({ j }, s)); });
+    S.leaves.filter(l => l.worker_id === w.worker_id && l.date_to >= ws && l.date_from <= we).forEach(l =>
+      items.push({ lv: l, a: Math.max(0, Math.round((parse(l.date_from)-parse(ws))/864e5)), b: Math.min(6, Math.round((parse(l.date_to)-parse(ws))/864e5)) }));
+    h += rowHtml(`${avatar(w.worker_id, null, true)}<span>${esc(wName(w))}</span>`, items);
+  });
+  if (S.filter === 'all'){
+    const un = []; live.filter(j => !asgIds(j).length).forEach(j => { const s = segOf(j, ws); if (s) un.push(Object.assign({ j }, s)); });
+    if (un.length) h += rowHtml(`<span style="font-size:18px">❓</span><span>${T('unassigned')}</span>`, un);
+  }
+  h += `</div><div class="legend"><span><i style="background:var(--offBg);border:1px solid #fecdd3"></i>${T('holiday')}</span>
+    <span><i style="background:repeating-linear-gradient(45deg,#cbd5e1,#cbd5e1 3px,#e2e8f0 3px,#e2e8f0 6px)"></i>${T('leave')}</span>
+    <span><i style="outline:2px dashed var(--bad);outline-offset:-2px;background:#fff"></i>${T('leaveClash')}</span></div>`;
+  return h;
+}
+
+/* ---------- เดือน ---------- */
+function viewMonth(){
+  const c = parse(S.cursor), y = c.getFullYear(), mo = c.getMonth();
+  const first = ymd(new Date(y, mo, 1)), last = ymd(new Date(y, mo+1, 0)), gs = weekStart(first);
+  const weeks = Math.ceil((Math.round((parse(last) - parse(gs)) / 864e5) + 1) / 7);
+  let h = `<div class="shead"><h2>${T('monthsFull')[mo]} ${y+543}</h2>
+    ${(S.today||'').slice(0,7)!==first.slice(0,7)?`<button class="todaybtn" onclick="goToday()">${T('today')}</button>`:''}
+    <button class="navbtn" onclick="nav(-1)">${ICONS.l}</button><button class="navbtn" onclick="nav(1)">${ICONS.r}</button></div>`;
+  h += chipsHtml();
+  h += `<div class="mcal"><div class="mhead">${WEEK_ORDER.map(i => `<div class="${WEEKLY_OFF.includes(i)?'off':''}">${T('days')[i]}</div>`).join('')}</div>`;
+  for (let w = 0; w < weeks; w++){
+    const a = addDays(gs, w*7), b = addDays(a, 6);
+    h += '<div class="mweek">';
+    for (let i = 0; i < 7; i++){
+      const x = addDays(a,i), out = parse(x).getMonth() !== mo;
+      h += `<button class="mday ${out?'out':''} ${holidayOf(x)?'off':''} ${x===S.today?'today':''}" style="grid-column:${i+1}" onclick="pickDay('${x}')"><span class="n">${parse(x).getDate()}</span></button>`;
+    }
+    const items = [];
+    S.holidays.filter(hd => hd.date >= a && hd.date <= b).forEach(hd => { const i = Math.round((parse(hd.date)-parse(a))/864e5); items.push({ hol: hd, a: i, b: i }); });
+    S.jobs.filter(j => j.status !== 'cancelled' && j.end_date >= a && j.start_date <= b && applyFilter(j))
+      .forEach(j => { const s = segOf(j, a); if (s) items.push(Object.assign({ j }, s)); });
+    lanes(items);
+    const hidden = Array(7).fill(0);
+    items.forEach(it => {
+      if (it.lane > 2){ for (let i = it.a; i <= it.b; i++) hidden[i]++; return; }
+      const pos = `grid-column:${it.a+1}/${it.b+2};grid-row:${it.lane+2}`;
+      if (it.hol) { h += `<button class="mbar hol" style="${pos}" onclick="pickDay('${it.hol.date}')"><span>🎌 ${esc(it.hol.name)}</span></button>`; return; }
+      const cont = it.j.start_date < a, goes = it.j.end_date > b && it.b === 6;
+      h += `<button class="mbar ${it.j.status==='done'?'isdone':''} ${cont?'cont':''} ${goes?'goes':''}" style="${pos};background:${pc(it.j)}" onclick="openDetail('${it.j.job_id}')"><span>${esc(it.j.customer)}</span></button>`;
+    });
+    hidden.forEach((n,i) => { if (n) h += `<div class="mmore" style="grid-column:${i+1}">+${n}</div>`; });
+    h += '</div>';
+  }
+  h += '</div>';
+  // โปรเจกต์ในเดือนนี้
+  const groups = {};
+  S.jobs.filter(j => j.status !== 'cancelled' && j.end_date >= first && j.start_date <= last && applyFilter(j)).forEach(j => {
+    const k = projKey(j.customer);
+    const g = groups[k] = groups[k] || { name: j.customer, s: j.start_date, e: j.end_date, n: 0, ppl: new Set(), col: pc(j), first: j.job_id };
+    if (j.start_date < g.s) g.s = j.start_date; if (j.end_date > g.e) g.e = j.end_date; g.n++; asgIds(j).forEach(p => g.ppl.add(p));
+  });
+  const gl = Object.values(groups).sort((x,y) => x.s.localeCompare(y.s));
+  if (gl.length) h += `<div class="plist"><h4>${T('projects')} (${gl.length})</h4>` + gl.map(g =>
+    `<button class="pitem" onclick="openDetail('${g.first}')"><i style="background:${g.col}"></i><div class="pt"><b>${esc(g.name)}</b><span>${shortD(g.s)} – ${shortD(g.e)}</span></div>
+     <div class="cnt">${g.n} ${T('jobsN')} · ${g.ppl.size} ${T('people')}</div></button>`).join('') + '</div>';
+  return h;
+}
+
+/* ---------- เมนู ---------- */
+function viewMenu(){
+  const it = (ic, bg, t, sub, fn) => `<button class="mitem" onclick="${fn}"><span class="ic" style="background:${bg}">${ic}</span><span class="tx">${t}<small>${sub}</small></span><span class="chev">›</span></button>`;
+  let h = `<div class="shead"><h2>${T('menu')}</h2></div>`;
+  const who = S.user ? `${avatar(S.user.worker_id, null)}<div><b>${esc(wName(S.user))}</b><small>${esc(teamLabel(S.user.team||''))}${S.isAdmin?' · '+T('admin'):''}</small></div>`
+    : `<span class="av" style="background:var(--brand)">A</span><div><b>${esc(S.displayName || '')}</b><small>${S.isAdmin ? T('admin') : ''}</small></div>`;
+  h += `<div class="meinfo">${who}</div>`;
+  if (S.isAdmin){
+    h += `<div class="mtitle">${T('menuAdmin')}</div><div class="mlist">
+      ${it('➕','#e7f0fb',T('newJob'),'','openJob()')}
+      ${it('📢','#e0f2fe',T('broadcast').replace(/^📢\s*/,''),T('bcSub'),'openBroadcast()')}
+      ${it('🏖','#f1f5f9',T('addLeave'),T('leaveSub'),'openLeave()')}
+      ${it('🎌','#ffe4e6',T('addHoliday'),T('holSub'),'openHoliday()')}
+      ${it('👷','#ede9fe',T('manageWorkers'),S.workers.length+' '+T('people')+' · '+T('workersSub'),'openWorker()')}</div>`;
+  }
+  h += `<div class="mtitle">${T('menuGen')}</div><div class="mlist">
+      ${it('📄','#dcfce7',T('export'),T('exportSub'),'openExport()')}
+      ${it('🌐','#fef3c7',T('langSet'),lang==='th'?'ไทย → မြန်မာ':'မြန်မာ → ไทย','toggleLang()')}</div>`;
+  return h;
+}
+
+/* ================== popup ================== */
 const ov = () => document.getElementById('ov');
-function openModal(html){ document.getElementById('sheet').innerHTML = html; ov().classList.add('on'); document.getElementById('fab').classList.remove('open'); }
+function openModal(html){ document.getElementById('sheet').innerHTML = html; document.getElementById('sheet').scrollTop = 0; ov().classList.add('on'); }
 function closeModal(){ ov().classList.remove('on'); }
+function askConfirm(title, sub, yesLabel, onYes){
+  window.__yes = () => { closeModal(); onYes(); };
+  openModal(`<div class="dbody"><div class="dtitle">${esc(title)}</div>${sub?`<p class="dsub">${esc(sub)}</p>`:''}
+    <div class="dacts two"><button class="btn ghost" onclick="closeModal()">${T('cancel')}</button><button class="btn red" onclick="__yes()">${esc(yesLabel)}</button></div></div>`);
+}
 
 function openRegister(){
-  openModal(`<h3>${T('register')}</h3><div class="meta">${T('noAccess')}</div>
-    <label>${T('chooseName')}</label><select id="regW">${S.workers.filter(w=>!w.line_user_id).map(w=>`<option value="${w.worker_id}">${esc(w.name_th)}${w.name_mm?' / '+esc(w.name_mm):''}</option>`).join('')}</select>
-    <div class="acts"><button class="btn p" onclick="doRegister()">${T('save')}</button></div>`);
+  const free = S.workers.filter(w => !w.line_user_id);
+  openModal(`<div class="dbody f"><div class="dtitle">${T('register')}</div><p class="dsub">${T('noAccess')}</p>
+    <div class="pick">${free.map(w => `<button type="button" class="pk" data-w="${w.worker_id}" onclick="document.querySelectorAll('.pk').forEach(b=>b.classList.toggle('on',b===this))">${avatar(w.worker_id,null)}<span>${esc(w.name_th)}</span>${w.name_mm?`<small>${esc(w.name_mm)}</small>`:''}</button>`).join('')}</div>
+    <div class="dacts" style="margin-top:16px"><button class="btn primary" onclick="doRegister()">${T('save')}</button></div></div>`);
 }
 async function doRegister(){
-  try{ const r = await call('register',{ workerId: document.getElementById('regW').value }); S.user = r.user; S.filter='me'; renderWho(); closeModal(); render(); loadRange(true); toast(T('saved')); }
+  const sel = document.querySelector('.pk.on'); if (!sel) return toast(T('register2'));
+  try{ const r = await call('register',{ workerId: sel.dataset.w }); S.user = r.user; S.filter='me'; renderWho(); closeModal(); render(); loadRange(true); toast(T('saved')); }
   catch(e){ alert(e.message); }
 }
 
 function openDetail(id){
-  const j = S.jobs.find(x=>x.job_id===id); if(!j) return;
-  openModal(`<h3>${esc(j.customer)}</h3>${jobCard(j, j.start_date<=S.today && j.end_date>=S.today)}<div class="acts"><button class="btn" onclick="closeModal()">${T('close')}</button></div>`);
+  const j = S.jobs.find(x => x.job_id === id); if (!j) return;
+  const d = (j.start_date <= S.today && j.end_date >= S.today) ? S.today : j.start_date;
+  const steps = ['planned','in_progress','done'], ci = steps.indexOf(j.status);
+  const stepper = ci < 0 ? `<span class="st st-${esc(j.status)} stbadge">${esc(T('statuses')[j.status]||j.status)}</span>` :
+    `<div class="stepper">${steps.map((s,i) => { const dn = i < ci || j.status === 'done', cur = i === ci && j.status !== 'done';
+      return `${i?`<div class="ln ${i<=ci?'done':''}"></div>`:''}<div class="sp ${dn?'done':cur?'cur':''}"><i>${dn?'✓':i+1}</i>${esc(T('statuses')[s])}</div>`; }).join('')}</div>`;
+  const photos = (j.done_photos||'').split('|').filter(Boolean);
+  const atts = (j.attachments||'').split('|').filter(Boolean);
+  const isImg = u => /^data:image|\.(jpe?g|png|gif|webp)|uc\?export|drive\.google\.com\/thumbnail/i.test(u);
+  const mapUrl = j.map_url || (j.address ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(j.address) : '');
+  const admin = S.isAdmin && !j._pending ? `<div class="dacts two" style="margin-top:8px"><button class="btn ghost" onclick="openJob('${j.job_id}')">✏️ ${T('edit')}</button><button class="btn danger" onclick="delJob('${j.job_id}')">🗑 ${T('del2')}</button></div>` : '';
+  openModal(`<div class="dhead" style="--pc:${pc(j)}"><button class="x" onclick="closeModal()" aria-label="${esc(T('close'))}">✕</button>
+      <span class="type">${TYPE_IC[j.job_type]||''} ${esc(T('types')[j.job_type]||j.job_type)}</span><h3>${esc(j.customer)}</h3>
+      <div class="sub">${shortD(j.start_date)}${j.end_date!==j.start_date?' – '+shortD(j.end_date):''}${j.start_time?' · '+esc(j.start_time):''}</div></div>
+    <div class="dbody">${stepper}
+      <div class="info">
+        ${j.detail?`<div class="k">📝</div><div class="v">${esc(j.detail)}</div>`:''}
+        ${j.address||mapUrl?`<div class="k">📍</div><div class="v">${esc(j.address||'')}${mapUrl?`<small><a href="${esc(mapUrl)}" target="_blank" rel="noopener">🧭 ${T('nav')}</a></small>`:''}</div>`:''}
+        ${j.due_date?`<div class="k">⏰</div><div class="v">${T('dueDate')} ${fmtLong(j.due_date)}</div>`:''}
+        ${j.note?`<div class="k">💬</div><div class="v">${esc(j.note)}</div>`:''}
+      </div>
+      ${atts.length?`<div class="mtitle" style="margin:0 0 6px">${T('attachments')}</div><div class="thumbs" style="margin:0 0 14px">${atts.map((u,i)=>isImg(u)?`<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt=""></a>`:`<a class="file" href="${esc(u)}" target="_blank" rel="noopener">📎 ${i+1}</a>`).join('')}</div>`:''}
+      ${photos.length?`<div class="mtitle" style="margin:0 0 6px">${T('photos')}</div><div class="thumbs" style="margin:0 0 14px">${photos.map(u=>`<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" alt=""></a>`).join('')}</div>`:''}
+      <div class="mtitle" style="margin:0 0 8px">${T('assignees')}</div>
+      <div class="plist2">${asgIds(j).length ? asgIds(j).map(id => { const s = ciState(id, d), w = worker(id);
+        return `<div class="prow">${avatar(id, d)}<span>${esc(w ? wName(w) : id)}</span>${s?`<span class="tag ${s}">${s==='in'?T('checkedIn'):s==='wait'?T('notCheckedIn'):T('onLeave')}</span>`:''}</div>`; }).join('') : `<div class="hint">${T('unassigned')}</div>`}</div>
+      ${actionsHtml(j, true)}${admin}
+    </div>`);
 }
 
-let jobAtt = [];
+/* ---- ฟอร์มลงงาน / แก้งาน ---- */
+let jobAtt = [], FA = [], FTYPE = '';
 function openJob(id){
-  const j = id ? S.jobs.find(x=>x.job_id===id) : { start_date:S.cursor, end_date:S.cursor, due_date:S.cursor, job_type:S.jobTypes[0], status:'planned', assignees:'' };
-  jobAtt = (j.attachments||'').split('|').filter(Boolean);
-  const ids = (j.assignees||'').split(',').map(s=>s.trim());
-  openModal(`<h3>${id?T('editJob'):T('newJob')}</h3>
-    <input type="hidden" id="f_id" value="${esc(j.job_id||'')}">
-    <label>${T('jobType')}</label><select id="f_type">${S.jobTypes.map(t=>`<option ${t===j.job_type?'selected':''} value="${t}">${esc(T('types')[t]||t)}</option>`).join('')}</select>
-    <label>${T('customer')} *</label><input id="f_customer" value="${esc(j.customer||'')}">
-    <div class="g2"><div><label>${T('startDate')} *</label><input type="date" id="f_start" value="${j.start_date}" onchange="syncDates(this.value)"></div><div><label>${T('endDate')}</label><input type="date" id="f_end" value="${j.end_date||j.start_date}"></div></div>
-    <div class="g2"><div><label>${T('startTime')}</label><input type="time" id="f_time" value="${esc(j.start_time||'')}"></div><div><label>${T('dueDate')}</label><input type="date" id="f_due" value="${esc(j.due_date||'')}"></div></div>
-    <label>${T('assignees')}</label><div class="cbs">${S.workers.map(w=>`<label><input type="checkbox" class="f_as" value="${w.worker_id}" ${ids.includes(w.worker_id)?'checked':''}>${esc(wName(w))}</label>`).join('')}</div>
-    <label>${T('team')}</label><select id="f_team"><option value="">-</option>${[...new Set(S.workers.map(w=>w.team).filter(Boolean))].map(t=>`<option ${t===j.team?'selected':''}>${esc(t)}</option>`).join('')}</select>
-    <label>${T('address')}</label><textarea id="f_addr">${esc(j.address||'')}</textarea>
+  const j = id ? S.jobs.find(x=>x.job_id===id) : { start_date:S.cursor, end_date:S.cursor, due_date:S.cursor, start_time:'08:00', job_type:(S.jobTypes[0]||'ติดตั้ง'), status:'planned', assignees:'' };
+  if (!j) return;
+  jobAtt = (j.attachments||'').split('|').filter(Boolean); FA = asgIds(j); FTYPE = j.job_type;
+  const custs = [...new Set(S.jobs.map(x => x.customer).filter(Boolean))];
+  const teams = [...new Set(S.workers.map(w => w.team || ''))];
+  const pick = t => `<div class="teamlbl">${esc(t ? teamLabel(t) : '—')}</div>` + S.workers.filter(w => (w.team||'') === t).map(w => { const lv = leaveOf(w.worker_id, j.start_date);
+    return `<button type="button" class="pk ${FA.includes(w.worker_id)?'on':''} ${lv?'lv':''}" onclick="togW(this,'${w.worker_id}')">${avatar(w.worker_id,null)}<span>${esc(wName(w))}</span>${lv?`<small>🏖 ${T('onLeave')}</small>`:''}</button>`; }).join('');
+  openModal(`<div class="dbody f"><div class="dtitle">${id?T('editJob'):T('newJob')}</div>
+    <input type="hidden" id="f_id" value="${esc(j.job_id||'')}"><input type="hidden" id="f_team" value="${esc(j.team||'')}">
+    <label>${T('jobType')}</label><div class="tchips" id="f_types">${(S.jobTypes.length?S.jobTypes:Object.keys(TYPE_IC)).map(t => `<button type="button" class="tchip ${FTYPE===t?'on':''}" onclick="FTYPE='${esc(t)}';document.querySelectorAll('#f_types .tchip').forEach(b=>b.classList.toggle('on',b===this))">${TYPE_IC[t]||''} ${esc(T('types')[t]||t)}</button>`).join('')}</div>
+    <label>${T('customer')} *</label><input id="f_customer" list="f_custs" value="${esc(j.customer||'')}" autocomplete="off"><datalist id="f_custs">${custs.map(c => `<option value="${esc(c)}">`).join('')}</datalist>
+    <div class="g2"><div><label>${T('startDate')} *</label><input type="date" id="f_start" value="${esc(j.start_date)}" onchange="syncDates(this.value)"></div>
+      <div><label>${T('endDate')}</label><input type="date" id="f_end" value="${esc(j.end_date||j.start_date)}"></div></div>
+    <div class="g2"><div><label>${T('startTime')}</label><input type="time" id="f_time" value="${esc(j.start_time||'')}"></div>
+      <div><label>${T('dueDate')}</label><input type="date" id="f_due" value="${esc(j.due_date||'')}"></div></div>
+    <label>${T('assignees')}</label><div class="pick">${teams.map(pick).join('')}</div>
+    <label>${T('address')}</label><input id="f_addr" value="${esc(j.address||'')}">
     <label>${T('mapUrl')}</label><input id="f_map" value="${esc(j.map_url||'')}" placeholder="https://maps.app.goo.gl/...">
     <input type="hidden" id="f_lat" value="${esc(j.lat||'')}"><input type="hidden" id="f_lng" value="${esc(j.lng||'')}">
-    <div class="acts"><button class="btn sm" onclick="useLocation()">${T('useLocation')}</button></div>
+    <button type="button" class="btn ghost sm" style="margin-top:8px" onclick="useLocation()">${T('useLocation')}</button>
     <label>${T('detail')}</label><textarea id="f_detail">${esc(j.detail||'')}</textarea>
-    ${id?`<label>${T('status')}</label><select id="f_status">${S.statuses.map(s=>`<option value="${s}" ${s===j.status?'selected':''}>${esc(T('statuses')[s])}</option>`).join('')}</select>`:''}
+    ${id?`<label>${T('status')}</label><select id="f_status">${S.statuses.map(s=>`<option value="${s}" ${s===j.status?'selected':''}>${esc(T('statuses')[s]||s)}</option>`).join('')}</select>`:''}
     <label>${T('attachments')}</label><input type="file" id="f_files" multiple accept="image/*,.pdf" onchange="addAttachments(this)">
     <div class="thumbs" id="f_thumbs">${attThumbs()}</div>
-    <div class="acts"><button class="btn p" id="f_save" onclick="saveJob()">${T('save')}</button><button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+    <div class="dacts two" style="margin-top:16px"><button class="btn ghost" onclick="closeModal()">${T('cancel')}</button><button class="btn primary" id="f_save" onclick="saveJob()">${T('save')}</button></div></div>`);
 }
-function attThumbs(){ return jobAtt.map((u,i)=>`<span>${/uc\?export|drive\.google\.com\/thumbnail|\.(jpe?g|png|webp)/i.test(u)?`<img src="${esc(u)}">`:'📎'}<br><a href="#" onclick="jobAtt.splice(${i},1);document.getElementById('f_thumbs').innerHTML=attThumbs();return false;">✕</a></span>`).join(''); }
+function togW(b, id){ const i = FA.indexOf(id); if (i < 0) FA.push(id); else FA.splice(i,1); b.classList.toggle('on'); }
+function attThumbs(){ return jobAtt.map((u,i)=>`<span>${/^data:image|uc\?export|drive\.google\.com\/thumbnail|\.(jpe?g|png|webp)/i.test(u)?`<img src="${esc(u)}" alt="">`:'📎'}<a href="#" onclick="jobAtt.splice(${i},1);document.getElementById('f_thumbs').innerHTML=attThumbs();return false;">✕</a></span>`).join(''); }
 async function addAttachments(inp){
   for (const f of inp.files){
     try{
@@ -706,7 +1061,7 @@ async function addAttachments(inp){
       jobAtt.push(r.url);
     }catch(e){ alert(e.message); }
   }
-  inp.value=''; document.getElementById('f_thumbs').innerHTML = attThumbs();
+  inp.value=''; const el = document.getElementById('f_thumbs'); if (el) el.innerHTML = attThumbs();
 }
 function useLocation(){
   if (!navigator.geolocation) return alert('no geolocation');
@@ -718,19 +1073,27 @@ function useLocation(){
   }, e => alert(e.message), { enableHighAccuracy:true, timeout:10000 });
 }
 function syncDates(v){ if(!v) return; document.getElementById('f_end').value = v; document.getElementById('f_due').value = v; }
+// ทีมของงาน = ทีมที่ช่างที่เลือกส่วนใหญ่สังกัด (ไม่เลือกช่าง = คงค่าเดิม)
+function teamOf(ids, fallback){
+  const cnt = {}; ids.forEach(id => { const w = worker(id); if (w && w.team) cnt[w.team] = (cnt[w.team]||0) + 1; });
+  const best = Object.keys(cnt).sort((a,b) => cnt[b] - cnt[a])[0];
+  return best || fallback || '';
+}
 async function saveJob(){
   const g = id => document.getElementById(id);
-  const job = { job_id:g('f_id').value, job_type:g('f_type').value, customer:g('f_customer').value.trim(), start_date:g('f_start').value, end_date:g('f_end').value||g('f_start').value,
-    start_time:g('f_time').value, due_date:g('f_due').value, assignees:[...document.querySelectorAll('.f_as:checked')].map(c=>c.value), team:g('f_team').value,
+  const job = { job_id:g('f_id').value, job_type:FTYPE, customer:g('f_customer').value.trim(), start_date:g('f_start').value, end_date:g('f_end').value||g('f_start').value,
+    start_time:g('f_time').value, due_date:g('f_due').value, assignees:FA.slice(), team:teamOf(FA, g('f_team').value),
     address:g('f_addr').value.trim(), map_url:g('f_map').value.trim(), lat:g('f_lat').value, lng:g('f_lng').value, detail:g('f_detail').value.trim(),
     status: g('f_status') ? g('f_status').value : 'planned', attachments: jobAtt };
-  if (!job.customer || !job.start_date) return alert(T('customer') + ' / ' + T('startDate'));
+  if (!job.customer || !job.start_date) return toast(T('needCust'));
   if (job.end_date < job.start_date) job.end_date = job.start_date;
   // optimistic: แสดงผลในเครื่องทันที ปิดฟอร์ม แล้วค่อยส่งขึ้นเซิร์ฟเวอร์เบื้องหลัง (ล้มเหลว → ย้อนกลับ + แจ้ง)
   const isNew = !job.job_id;
   const prev = isNew ? null : Object.assign({}, S.jobs.find(x => x.job_id === job.job_id) || {});
   const local = Object.assign({}, prev || {}, job, { job_id: job.job_id || ('tmp' + Date.now()), assignees: job.assignees.join(','), attachments: jobAtt.join('|'), _pending: true });
-  upsertLocal(S.jobs, 'job_id', local); closeModal(); render(); toast(T('saving'));
+  upsertLocal(S.jobs, 'job_id', local); closeModal();
+  if (isNew) { S.cursor = job.start_date; if (S.view === 'menu') S.view = 'day'; }
+  render(); toast(T('saving'));
   try{
     const r = await call('saveJob', { job, isNew });
     S.jobs = S.jobs.filter(x => x.job_id !== local.job_id); upsertLocal(S.jobs, 'job_id', r.job); noteVersion(r); saveCache(); render(); toast(T('saved'));
@@ -738,11 +1101,13 @@ async function saveJob(){
     S.jobs = S.jobs.filter(x => x.job_id !== local.job_id); if (prev && prev.job_id) upsertLocal(S.jobs, 'job_id', prev); render(); alert(e.message);
   }
 }
-async function delJob(id){
-  if(!confirm(T('confirmDel'))) return;
-  const prev = S.jobs.find(x => x.job_id === id); S.jobs = S.jobs.filter(x => x.job_id !== id); closeModal(); render();
-  try{ const r = await call('deleteJob',{jobId:id}); noteVersion(r); saveCache(); }
-  catch(e){ if (prev) upsertLocal(S.jobs, 'job_id', prev); render(); alert(e.message); }
+function delJob(id){
+  const j = S.jobs.find(x => x.job_id === id); if (!j) return;
+  askConfirm(T('confirmDel'), j.customer, '🗑 ' + T('del2'), async () => {
+    const prev = j; S.jobs = S.jobs.filter(x => x.job_id !== id); render();
+    try{ const r = await call('deleteJob',{jobId:id}); noteVersion(r); saveCache(); toast(T('saved')); }
+    catch(e){ upsertLocal(S.jobs, 'job_id', prev); render(); alert(e.message); }
+  });
 }
 async function setStatus(id, st, extra){
   const j = S.jobs.find(x => x.job_id === id); if (!j) return;
@@ -756,60 +1121,73 @@ async function setStatus(id, st, extra){
   catch(e){ Object.assign(j, prev); delete j._pending; render(); alert(e.message); }
 }
 
+/* ---- งานเสร็จ + รูป (บังคับ ≥1 รูปสำหรับช่าง) ---- */
 let finPhotos = [];
 function openFinish(id){
+  const j = S.jobs.find(x => x.job_id === id); if (!j) return;
   finPhotos = [];
-  openModal(`<h3>✅ ${T('finish')}</h3><input type="hidden" id="fin_id" value="${id}">
-    <label>${T('attachPhoto')}</label><input type="file" accept="image/*" capture="environment" multiple onchange="addFinPhotos(this)">
+  openModal(`<div class="dbody f"><div class="dtitle">✓ ${T('finish')}</div><p class="dsub">${esc(j.customer)}</p>
+    <input type="hidden" id="fin_id" value="${esc(id)}">
+    <label class="photo"><input type="file" accept="image/*" capture="environment" multiple onchange="addFinPhotos(this)"><div class="big">📷</div>${T('tapPhoto')}<div class="hint" id="fin_hint">${T('attachPhoto')}</div></label>
     <div class="thumbs" id="fin_thumbs"></div>
     <label>${T('finishNote')}</label><textarea id="fin_note"></textarea>
-    <div class="acts"><button class="btn g" id="fin_save" onclick="doFinish()">${T('save')}</button><button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+    <div class="dacts two" style="margin-top:14px"><button class="btn ghost" onclick="closeModal()">${T('cancel')}</button><button class="btn finish" id="fin_save" onclick="doFinish()">${T('save')}</button></div></div>`);
 }
 async function addFinPhotos(inp){
   for (const f of inp.files) finPhotos.push(await shrink(f));
-  inp.value=''; document.getElementById('fin_thumbs').innerHTML = finPhotos.map(d=>`<img src="${d}">`).join('');
+  inp.value=''; document.getElementById('fin_thumbs').innerHTML = finPhotos.map(d=>`<img src="${d}" alt="">`).join('');
 }
 function doFinish(){
-  if (!finPhotos.length && !S.isAdmin) return alert(T('attachPhoto'));
+  if (!finPhotos.length && !S.isAdmin){ const h = document.getElementById('fin_hint'); if (h) h.classList.add('bad'); return toast(T('attachPhoto')); }
   const id = document.getElementById('fin_id').value, note = document.getElementById('fin_note').value.trim();
   const photos = finPhotos.map(d=>({data:d,mime:'image/jpeg'})); finPhotos = [];
   closeModal();
   setStatus(id, 'done', { photos, note });   // optimistic — ปิดฟอร์มทันที อัปโหลดรูปเบื้องหลัง
 }
 
+/* ---- วันลา ---- */
+let LVTYPE = '';
 function openLeave(){
-  openModal(`<h3>${T('addLeave')}</h3>
+  LVTYPE = I18N.th.lvTypes[0];
+  openModal(`<div class="dbody f"><div class="dtitle">🏖 ${T('addLeave')}</div>
     <label>${T('worker')}</label><select id="lv_w">${S.workers.map(w=>`<option value="${w.worker_id}">${esc(wName(w))}</option>`).join('')}</select>
-    <div class="g2"><div><label>${T('dateFrom')}</label><input type="date" id="lv_from" value="${S.cursor}"></div><div><label>${T('dateTo')}</label><input type="date" id="lv_to" value="${S.cursor}"></div></div>
-    <label>${T('leaveType')}</label><select id="lv_type">${T('lvTypes').map((t,i)=>`<option value="${I18N.th.lvTypes[i]}">${t}</option>`).join('')}</select>
+    <div class="g2"><div><label>${T('dateFrom')}</label><input type="date" id="lv_from" value="${esc(S.cursor)}" onchange="document.getElementById('lv_to').value=this.value"></div><div><label>${T('dateTo')}</label><input type="date" id="lv_to" value="${esc(S.cursor)}"></div></div>
+    <label>${T('leaveType')}</label><div class="tchips" id="lv_types">${T('lvTypes').map((t,i)=>`<button type="button" class="tchip ${i?'':'on'}" onclick="LVTYPE='${esc(I18N.th.lvTypes[i])}';document.querySelectorAll('#lv_types .tchip').forEach(b=>b.classList.toggle('on',b===this))">${esc(t)}</button>`).join('')}</div>
     <label>${T('note')}</label><input id="lv_note">
-    <div class="acts"><button class="btn p" onclick="saveLeave()">${T('save')}</button><button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+    <div class="dacts two" style="margin-top:16px"><button class="btn ghost" onclick="closeModal()">${T('cancel')}</button><button class="btn primary" onclick="saveLeave()">${T('save')}</button></div></div>`);
 }
 async function saveLeave(){
   const g = id => document.getElementById(id).value;
-  const leave = { leave_id:'tmp'+Date.now(), worker_id:g('lv_w'), date_from:g('lv_from'), date_to:g('lv_to')||g('lv_from'), type:g('lv_type'), note:g('lv_note') };
+  const leave = { leave_id:'tmp'+Date.now(), worker_id:g('lv_w'), date_from:g('lv_from'), date_to:g('lv_to')||g('lv_from'), type:LVTYPE, note:g('lv_note') };
   if (!leave.date_from) return;
+  if (leave.date_to < leave.date_from) leave.date_to = leave.date_from;
+  const clash = S.jobs.filter(j => asgIds(j).includes(leave.worker_id) && j.end_date >= leave.date_from && j.start_date <= leave.date_to && !['done','cancelled'].includes(j.status));
   S.leaves.push(leave); closeModal(); render(); toast(T('saving'));
   try{ const r = await call('saveLeave',{ leave:{ worker_id:leave.worker_id, date_from:leave.date_from, date_to:leave.date_to, type:leave.type, note:leave.note } });
-    S.leaves = S.leaves.filter(l => l.leave_id !== leave.leave_id); upsertLocal(S.leaves, 'leave_id', r.leave); noteVersion(r); saveCache(); render(); toast(T('saved')); }
+    S.leaves = S.leaves.filter(l => l.leave_id !== leave.leave_id); upsertLocal(S.leaves, 'leave_id', r.leave); noteVersion(r); saveCache(); render();
+    toast(clash.length ? `⚠ ${T('clashWarn')} ${clash.length} ${T('jobsN')}` : T('leaveSaved')); }
   catch(e){ S.leaves = S.leaves.filter(l => l.leave_id !== leave.leave_id); render(); alert(e.message); }
 }
-async function delLeave(id){
-  if(!confirm(T('confirmDel'))) return;
-  const prev = S.leaves.find(l => l.leave_id === id); S.leaves = S.leaves.filter(l => l.leave_id !== id); render();
-  try{ const r = await call('deleteLeave',{leaveId:id}); noteVersion(r); saveCache(); }
-  catch(e){ if (prev) S.leaves.push(prev); render(); alert(e.message); }
+function delLeave(id){
+  const l = S.leaves.find(x => x.leave_id === id); if (!l) return;
+  const w = worker(l.worker_id);
+  askConfirm(T('delLeaveQ'), `${w ? wName(w) : ''} · ${shortD(l.date_from)}${l.date_to !== l.date_from ? ' – ' + shortD(l.date_to) : ''}`, T('del'), async () => {
+    S.leaves = S.leaves.filter(x => x.leave_id !== id); render();
+    try{ const r = await call('deleteLeave',{leaveId:id}); noteVersion(r); saveCache(); }
+    catch(e){ S.leaves.push(l); render(); alert(e.message); }
+  });
 }
 
-function openHoliday(){
-  const cur = S.holidays.find(h=>h.date===S.cursor);
-  openModal(`<h3>${T('addHoliday')}</h3>
-    <label>${T('date')}</label><input type="date" id="h_date" value="${S.cursor}">
+/* ---- วันหยุดบริษัท ---- */
+function openHoliday(date){
+  const d0 = date || S.cursor, cur = S.holidays.find(h=>h.date===d0);
+  openModal(`<div class="dbody f"><div class="dtitle">🎌 ${T('addHoliday')}</div>
+    <label>${T('date')}</label><input type="date" id="h_date" value="${esc(d0)}">
     <label>${T('holidayName')}</label><input id="h_name" value="${esc(cur?cur.name:'')}">
-    <div class="acts"><button class="btn p" onclick="saveHoliday()">${T('save')}</button>${cur?`<button class="btn d" onclick="delHoliday()">${T('del')}</button>`:''}<button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+    <div class="dacts ${cur?'':'two'}" style="margin-top:16px;${cur?'grid-template-columns:1fr 1fr 1fr':''}"><button class="btn ghost" onclick="closeModal()">${T('cancel')}</button>${cur?`<button class="btn danger" onclick="delHoliday()">${T('del')}</button>`:''}<button class="btn primary" onclick="saveHoliday()">${T('save')}</button></div></div>`);
 }
 async function saveHoliday(){
-  const date = document.getElementById('h_date').value, name = document.getElementById('h_name').value; if (!date) return;
+  const date = document.getElementById('h_date').value, name = document.getElementById('h_name').value.trim(); if (!date || !name) return;
   const prev = S.holidays.slice(); upsertLocal(S.holidays, 'date', { date, name }); closeModal(); render(); toast(T('saving'));
   try{ const r = await call('saveHoliday',{ date, name }); noteVersion(r); saveCache(); toast(T('saved')); }
   catch(e){ S.holidays = prev; render(); alert(e.message); }
@@ -821,14 +1199,15 @@ async function delHoliday(){
   catch(e){ S.holidays = prev; render(); alert(e.message); }
 }
 
+/* ---- ช่าง ---- */
 function openWorker(){
-  openModal(`<h3>${T('manageWorkers')}</h3>
+  openModal(`<div class="dbody f"><div class="dtitle">👷 ${T('manageWorkers')}</div>
     <label>${T('worker')}</label><select id="w_sel" onchange="fillWorker()"><option value="">+ ${T('newWorker')}</option>${S.workers.map(w=>`<option value="${w.worker_id}">${esc(w.name_th)}</option>`).join('')}</select>
-    <label>${T('nameTh')}</label><input id="w_th"><label>${T('nameMm')}</label><input id="w_mm">
-    <label>${T('team')}</label><input id="w_team" list="teams"><datalist id="teams">${[...new Set(S.workers.map(w=>w.team).filter(Boolean))].map(t=>`<option value="${esc(t)}">`).join('')}</datalist>
-    <label>${T('role')}</label><select id="w_role"><option value="worker">worker</option><option value="lead">lead</option></select>
-    <label><input type="checkbox" id="w_active" checked style="width:auto"> ${T('active')}</label>
-    <div class="acts"><button class="btn p" onclick="saveWorker()">${T('save')}</button><button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+    <div class="g2"><div><label>${T('nameTh')}</label><input id="w_th"></div><div><label>${T('nameMm')}</label><input id="w_mm"></div></div>
+    <div class="g2"><div><label>${T('team')}</label><input id="w_team" list="teams"><datalist id="teams">${[...new Set(S.workers.map(w=>w.team).filter(Boolean))].map(t=>`<option value="${esc(t)}">`).join('')}</datalist></div>
+      <div><label>${T('role')}</label><select id="w_role"><option value="worker">worker</option><option value="lead">lead</option></select></div></div>
+    <label class="cbline"><input type="checkbox" id="w_active" checked> ${T('active')}</label>
+    <div class="dacts two" style="margin-top:16px"><button class="btn ghost" onclick="closeModal()">${T('cancel')}</button><button class="btn primary" onclick="saveWorker()">${T('save')}</button></div></div>`);
 }
 function fillWorker(){
   const w = worker(document.getElementById('w_sel').value) || {};
@@ -843,30 +1222,31 @@ async function saveWorker(){
   try{ const r = await call('saveWorker',{worker:w}); S.workers = r.workers; noteVersion(r); saveCache(); closeModal(); render(); toast(T('saved')); }catch(e){ alert(e.message); }
 }
 
+/* ---- ส่งออก ---- */
 async function openExport(){
   const ws = weekStart(S.cursor);
-  openModal(`<h3>${T('export')}</h3><div class="meta">${T('week_of')} ${fmt(ws)} – ${fmt(addDays(ws,6))}</div><div id="ex_body" class="empty">${T('exporting')}</div>`);
+  openModal(`<div class="dbody"><div class="dtitle">📄 ${T('export')}</div><p class="dsub">${T('week_of')} ${fmt(ws)} – ${fmt(addDays(ws,6))}</p><div id="ex_body" class="hint" style="text-align:center;padding:14px 0">⏳ ${T('exporting')}</div>
+    <div class="dacts"><button class="btn ghost" onclick="closeModal()">${T('close')}</button></div></div>`);
   try{
     const r = await call('exportWeek',{ weekStart: ws });
-    document.getElementById('ex_body').innerHTML = `<div class="acts" style="justify-content:center">
-      <a class="btn p" href="${r.pdfUrl}" target="_blank">📄 ${T('openPdf')}</a><a class="btn g" href="${r.xlsxUrl}" target="_blank">📊 ${T('openXlsx')}</a><a class="btn" href="${r.sheetUrl}" target="_blank">${T('openSheet')}</a></div>`;
-  }catch(e){ document.getElementById('ex_body').textContent = e.message; }
+    document.getElementById('ex_body').innerHTML = `<div class="dacts"><a class="btn primary" href="${esc(r.pdfUrl)}" target="_blank" rel="noopener">📄 ${T('openPdf')}</a><a class="btn finish" href="${esc(r.xlsxUrl)}" target="_blank" rel="noopener">📊 ${T('openXlsx')}</a><a class="btn ghost" href="${esc(r.sheetUrl)}" target="_blank" rel="noopener">${T('openSheet')}</a></div>`;
+  }catch(e){ const el = document.getElementById('ex_body'); if (el) el.textContent = e.message; }
 }
 
 /* ================== บอร์ดแคสต์เข้ากลุ่ม (แอดมิน) ================== */
-// ลงงาน/แก้งานไม่ส่ง LINE อัตโนมัติแล้ว — แอดมินเลือกร่างข้อความ แก้ได้ แล้วกดส่งเข้ากลุ่มเอง
+// ลงงาน/แก้งานไม่ส่ง LINE อัตโนมัติ — แอดมินเลือกร่างข้อความ แก้ได้ แล้วกดส่งเข้ากลุ่มเอง
 const BC_KINDS = [['today','bcToday'],['tomorrow','bcTomorrow'],['week','bcWeek'],['nextweek','bcNextWeek'],['custom','bcCustom']];
 let bcSeq = 0;
 function openBroadcast(){
-  openModal(`<h3>${T('broadcast')}</h3>
-    <div class="acts" id="bc_kinds" style="flex-wrap:wrap;justify-content:flex-start;margin-top:0">${BC_KINDS.map(([k,l])=>`<button class="btn sm" data-k="${k}" onclick="bcPick('${k}')">${T(l)}</button>`).join('')}</div>
-    <textarea id="bc_text" rows="12" style="min-height:240px;font-size:14px"></textarea>
-    <div class="meta" style="margin-top:6px">${T('bcHint')}</div>
-    <div class="acts"><button class="btn p" id="bc_send" onclick="sendBroadcast()">${T('bcSend')}</button><button class="btn" onclick="closeModal()">${T('cancel')}</button></div>`);
+  openModal(`<div class="dbody f"><div class="dtitle">${T('broadcast')}</div>
+    <div class="tchips" id="bc_kinds">${BC_KINDS.map(([k,l])=>`<button type="button" class="tchip" data-k="${k}" onclick="bcPick('${k}')">${T(l)}</button>`).join('')}</div>
+    <textarea id="bc_text" class="bctext" style="margin-top:10px"></textarea>
+    <div class="hint">${T('bcHint')}</div>
+    <div class="dacts two" style="margin-top:14px"><button class="btn ghost" onclick="closeModal()">${T('cancel')}</button><button class="btn primary" id="bc_send" onclick="sendBroadcast()">${T('bcSend')}</button></div></div>`);
   bcPick('today');
 }
 async function bcPick(kind){
-  document.querySelectorAll('#bc_kinds .btn').forEach(b => b.classList.toggle('p', b.dataset.k === kind));
+  document.querySelectorAll('#bc_kinds .tchip').forEach(b => b.classList.toggle('on', b.dataset.k === kind));
   const ta = document.getElementById('bc_text'); ta.dataset.kind = kind;
   if (kind === 'custom') { ta.value = ''; ta.placeholder = ''; ta.focus(); return; }
   const seq = ++bcSeq; ta.value = ''; ta.placeholder = T('loading');
@@ -876,10 +1256,10 @@ async function bcPick(kind){
 async function sendBroadcast(){
   const ta = document.getElementById('bc_text'), btn = document.getElementById('bc_send');
   const text = ta.value.trim(); if (!text) return;
-  if (!confirm(T('bcConfirm'))) return;
+  if (!btn.dataset.sure){ btn.dataset.sure = '1'; btn.textContent = T('confirm') + ' — ' + T('bcSend').replace(/^📢\s*/,''); btn.classList.add('red'); return; }   // กดซ้ำเพื่อยืนยัน
   btn.disabled = true; btn.textContent = T('bcSending');
   try{ await call('broadcast',{ text, kind: ta.dataset.kind }); closeModal(); toast(T('bcSent')); }
-  catch(e){ btn.disabled = false; btn.textContent = T('bcSend'); alert(e.message); }
+  catch(e){ btn.disabled = false; delete btn.dataset.sure; btn.classList.remove('red'); btn.textContent = T('bcSend'); alert(e.message); }
 }
 
 /* ================== image helpers ================== */
