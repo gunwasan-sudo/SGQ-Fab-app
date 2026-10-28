@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <title>SGQ บันทึกค่าใช้จ่าย</title>
-<meta name="description" content="ตัวอย่างหน้าเว็บระบบบันทึกค่าใช้จ่ายจากสลิปในกลุ่ม LINE ของ SGQ Co., Ltd. (ข้อมูลสมมติ)">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta name="description" content="ตัวอย่างระบบบันทึกค่าใช้จ่าย SGQ (ข้อมูลสมมติ)">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&amp;family=Prompt:wght@500;600&amp;display=swap" rel="stylesheet">
 <style>
 /* ===== SGQ expenses v2.1 — "ledger on aluminium" (single light theme) ===== */
@@ -303,7 +301,6 @@ button.tchip:hover{border-color:var(--ink3)}
 .set h4{font-size:var(--fs-16);margin-bottom:8px;font-weight:500}
 .set .hint{margin-top:0;margin-bottom:8px}
 .addrow{display:flex;gap:8px;margin-top:8px}
-.addrow input{flex:1;min-width:0;border:1px solid var(--line);border-radius:var(--rc);padding:0 10px;min-height:36px;font-size:var(--fs-16)}
 .acct,.usr{display:flex;align-items:center;gap:10px;padding:8px 0;font-size:var(--fs-14);border-top:1px solid var(--line2)}
 .acct:first-of-type,.usr:first-of-type{border-top:none}
 .acct .bk{width:30px;height:30px;border-radius:6px;color:var(--on-bank);display:grid;place-items:center;font-size:10px;font-weight:700;flex:none}
@@ -427,6 +424,31 @@ button.tchip:hover{border-color:var(--ink3)}
 .btns .g2{gap:8px}
 .rvamt.inc{color:var(--inc)}
 @keyframes slide{from{transform:translateX(40px);opacity:.5}to{transform:none;opacity:1}}
+.catlist{list-style:none;margin:0 0 10px;padding:0;border:1px solid var(--line2);border-radius:var(--rc)}
+.catrow{display:flex;align-items:center;gap:10px;padding:0 4px 0 12px;min-height:44px;border-top:1px solid var(--line2)}
+.catrow:first-child{border-top:none}
+.cdot{width:10px;height:10px;border-radius:50%;flex:none;display:inline-block}
+.cname{flex:1;min-width:0;font-size:var(--fs-14);font-weight:500;overflow-wrap:anywhere}
+.ccount{font-size:var(--fs-12);color:var(--ink3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cdel{min-width:44px;height:44px;border:none;background:none;border-radius:var(--rc);color:var(--ink3);font-size:var(--fs-18);line-height:1;flex:none;padding:0 8px}
+.cdel:hover{background:var(--badSoft);color:var(--bad)}
+.cdel[aria-expanded="true"]{background:var(--badSoft);color:var(--bad)}
+.cdel.armed{background:var(--bad);color:var(--onBrand);font-family:var(--font-display);font-size:var(--fs-13);font-weight:500}
+.clock{font-size:var(--fs-12);color:var(--ink3);white-space:nowrap;padding:0 8px;min-height:44px;display:inline-flex;align-items:center;gap:4px}
+@media (max-width:599px){.catrow{flex-wrap:wrap}.catrow:has(.clock){padding-top:10px}.clock{order:3;flex-basis:100%;min-height:0;padding:0 0 10px 20px;white-space:normal}}
+.catmove{padding:10px 12px 12px;background:var(--badSoft);border-top:1px solid var(--line2);font-size:var(--fs-13);color:var(--bad)}
+.catmove p{margin:0 0 8px}
+.catmove label{font-weight:600}
+.mvrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mvrow .sel{flex:1 1 180px;width:auto;min-height:36px;padding:4px 10px;font-size:var(--fs-14)}
+.btn.dangerfill{background:var(--bad);color:var(--onBrand);border-color:var(--bad)}
+.addform{margin-top:8px;padding:12px;border:1px solid var(--line2);border-radius:var(--rc);background:var(--surface2)}
+.addform .flabel{margin:0 0 6px}
+.addform .flabel + .swatches{margin-bottom:10px}
+.addform .sel{margin-bottom:10px}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:36px;height:36px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line);padding:0}
+.sw[aria-pressed="true"]{box-shadow:0 0 0 2px var(--ink)}
 /* ===== desktop ≥ 900px ===== */
 @media (min-width:900px){
   :root{--stickTop:env(safe-area-inset-top, 0px)}
@@ -575,6 +597,7 @@ const CATS = [
   {key:'util', name:'สาธารณูปโภค', color:'--cat-util'},
   {key:'other', name:'อื่นๆ', color:'--cat-other'}
 ];
+const FALLBACK_CAT = 'other';   // never deleted; receives records of deleted categories
 const NO_PROJ = 'ไม่ระบุโครงการ';
 const PROJECTS = ['บ้านคุณวิทยา บางนา','คอนโด The Base พระราม 9','โรงงาน ABC นิคมฯ บางปู','ร้านกาแฟ Slow Bar เอกมัย','หมู่บ้านศุภาลัย รังสิต', NO_PROJ];
 const POSTERS = ['คุณแอน (บัญชี)','พี่ต้น (หัวหน้าช่าง)','คุณบอส','ช่างเก่ง'];
@@ -625,7 +648,7 @@ const pct = (a, b) => b > 0 ? (a / b * 100) : 0;
 const shortName = p => String(p).replace(/\s*\(.*\)\s*$/, '');
 const trunc = (s, n) => (s = String(s ?? '')).length > n ? s.slice(0, n - 1) + '…' : s;
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-const catOf = key => CATS.find(c => c.key === key) || INCOME_CATS.find(c => c.key === key) || CATS[CATS.length - 1];
+const catOf = key => CATS.find(c => c.key === key) || INCOME_CATS.find(c => c.key === key) || CATS.find(c => c.key === FALLBACK_CAT) || CATS[CATS.length - 1];
 const F = token => 'style="fill:var(' + token + ')"';   // every SVG fill comes from a token
 
 /* --- aggregation (shared by every view, so numbers always agree) --- */
@@ -1141,7 +1164,7 @@ function taxCard(recs){
     row('taxVat', 'ภาษีซื้อ 7%', t.vat, 'จากใบกำกับภาษี ' + t.vatN + ' ใบ') + '</ul>' +
     (pendingAll().some(r => r.whtUnknown) ? '<p class="hint" style="margin:10px 0 0">มีรายการที่ยังไม่ระบุหัก ณ ที่จ่าย <a class="lnk" href="#review">ตรวจ →</a></p>' : '');
 }
-// project table: income | expense | net | expense share (all projects + totals)
+// project table: income | expense | net (+ share bar), totals row
 function projectTable(recs){
   const c = recs.filter(isCounted), totOut = outTotal(recs), totIn = inTotal(recs);
   const rows = PROJECTS.map(p => { const L = c.filter(r => r.project === p); return {p, i: inTotal(L), o: outTotal(L), n: L.length}; })
@@ -1150,7 +1173,7 @@ function projectTable(recs){
   const netCell = v => '<span class="' + (v < 0 ? 'neg' : '') + '">' + (v < 0 ? '−' + baht(-v) : baht(v)) + '</span>';
   return '<div class="twrap"><table class="ptable"><thead><tr><th scope="col">โครงการ</th><th scope="col" class="r">รายรับ</th><th scope="col" class="r">รายจ่าย</th><th scope="col" class="r">คงเหลือ</th></tr></thead><tbody>' +
     rows.map(x => { const p = pct(x.o, totOut), net = round2(x.i - x.o);
-      return '<tr data-act="proj-filter" data-proj="' + esc(x.p) + '"><th scope="row" class="pn"><button type="button" class="plink" data-act="proj-filter" data-proj="' + esc(x.p) + '" aria-label="' + esc(x.p + ' รายจ่าย ' + p.toFixed(1) + '% ของทั้งหมด') + '">' + esc(x.p) + '</button>' +
+      return '<tr data-act="proj-filter" data-proj="' + esc(x.p) + '" data-in="' + x.i + '" data-out="' + x.o + '"><th scope="row" class="pn"><button type="button" class="plink" data-act="proj-filter" data-proj="' + esc(x.p) + '" aria-label="' + esc(x.p + ' รายจ่าย ' + p.toFixed(1) + '% ของทั้งหมด') + '">' + esc(x.p) + '</button>' +
         '<span class="pbar" title="' + p.toFixed(1) + '% ของรายจ่าย"><svg width="100%" height="4" aria-hidden="true" focusable="false"><rect x="0" y="0" width="100%" height="4" rx="2" ' + F('--track') + '/><rect x="0" y="0" width="' + p.toFixed(2) + '%" height="4" rx="2" ' + F('--brand') + '/></svg><small>' + p.toFixed(0) + '%</small></span></th>' +
         '<td class="r" data-label="รายรับ">' + money(x.i, x.i ? 'inc' : 'muted') + '</td><td class="r" data-label="รายจ่าย">' + money(x.o) + '</td><td class="r" data-label="คงเหลือ">' + netCell(net) + '</td></tr>';
     }).join('') + '</tbody><tfoot><tr><th scope="row">รวม</th>' +
@@ -1170,7 +1193,7 @@ function dailyTable(mk){
     rows.map(x => '<tr><td>' + fmtDow(x.iso) + ' ' + fmtDate(x.iso) + '</td><td class="r">' + (x.n + x.ni) + '</td><td class="r">' + baht(x.v) + '</td><td class="r">' + (x.vi ? '+' + baht(x.vi) : '—') + '</td></tr>').join('') +
     '</tbody></table></div></details>';
 }
-// daily columns: one shared scale from 0 · expense (today brand, others 45%) · income teal · both = grouped
+// daily columns: one scale from 0; expense, income, or grouped (both)
 function drawDaily(){
   const el = $('dailyChart'); if (!el) return;
   const mk = state.month, data = dailySeries(mk), nDays = data.length, mode = state.chartMode;
@@ -1186,7 +1209,7 @@ function drawDaily(){
   const band = pw / nDays, gap = 2;
   const bw = both ? Math.max(1.5, Math.min(12, (band - 2 - gap) / 2)) : Math.max(2, Math.min(24, band - 2));
   const yS = v => M.t + ph - v / top * ph;
-  // today is dark only in expense mode (in "both" a bold label marks it, so it never competes with income teal)
+  // today is dark only in expense mode; 'both' marks it with a bold label
   const tok = (i, s) => s === 'i' ? '--barIncome' : (i === todayIdx && !both ? '--barToday' : '--barMuted');
   const xOf = (i, s) => both ? M.l + i * band + (band - (2 * bw + gap)) / 2 + (s === 'i' ? bw + gap : 0) : M.l + i * band + (band - bw) / 2;
   let s = '<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" tabindex="0" role="group" aria-roledescription="กราฟแท่ง" ' +
@@ -1493,7 +1516,7 @@ function closeSheet(){
   lastFocus = null;
 }
 function showErr(id, msg){ const e = $(id + '-err'); e.textContent = msg; e.hidden = false; $(id).setAttribute('aria-invalid', 'true'); $(id).focus(); }
-// read the detail form into the record (false if invalid) — used by save and approve
+// apply the detail form (false if invalid); used by save + approve
 function applyDetailForm(r, approving){
   const payee = $('d-payee').value.trim(), whtV = $('d-wht').value, proj = $('d-proj').value;
   if (!payee){ showErr('d-payee', 'กรุณาระบุชื่อ'); return false; }
@@ -1708,6 +1731,7 @@ function submitAdd(){
 /* --- view: menu --- */
 state.setOpen = {cat:false, proj:false};
 state.chatWht = null;
+state.chatCat = null; state.move = {cat:null, proj:null}; state.draft = {cat:'', proj:''}; state.newCatColor = null; state.catSeq = 1;
 const CHAT_WHT = state.recs.find(r => r.slipDate === TODAY_ISO && r.slipTime === '11:20').id;
 const CHAT_INC = state.recs.find(r => r.slipDate === '2026-10-24' && r.direction === 'in').id;
 function chatMsg(av, avTok, who, bubbles, time){
@@ -1719,6 +1743,7 @@ function botSummary(r){
     ' · หมวด: ' + esc(catOf(r.category).name) + (r.project !== NO_PROJ ? ' · โครงการ: ' + esc(r.project) : '');
 }
 function renderMenu(){
+  ['cat', 'proj'].forEach(k => { if ($('set-' + k + '-new')) state.draft[k] = $('set-' + k + '-new').value; });
   const r1 = byId(CHAT_REC), r2 = byId(CHAT_ASK), r3 = byId(CHAT_WHT), r4 = byId(CHAT_INC);
   const qr = ['เปลี่ยนหมวด', 'เปลี่ยนโครงการ', 'ไม่ใช่ค่าใช้จ่าย'];
   const qrBtns = (act, items, cur, lab) => '<div class="qr" role="group" aria-label="' + lab + '">' + items.map(q => '<button type="button" data-act="' + act + '" data-val="' + esc(q[0]) + '" aria-pressed="' + (cur === q[0]) + '">' + esc(q[1]) + '</button>').join('') + '</div>';
@@ -1741,16 +1766,11 @@ function renderMenu(){
       (state.chatWht != null ? chatMsg('SGQ', '--brand', 'SGQ บอทบัญชี', '<div class="bub">✅ ' + (state.chatWht === '3' ? 'บันทึกหัก ณ ที่จ่าย 3% ' + baht(w3.amount) + ' (ยอดก่อนหัก ' + baht(w3.gross) + ')' : 'บันทึกว่าไม่หัก ณ ที่จ่าย') + '</div>', 'เมื่อสักครู่') : '') +
       chatMsg('ต', '--chat-av1', r1.poster, '<div class="bub img">' + slipSVG(r1, 'md') + '</div><div class="bub mem">ค่ากระจก งานบ้านคุณวิทยา</div>', r1.slipTime) +
       chatMsg('SGQ', '--brand', 'SGQ บอทบัญชี', '<div class="bub">' + botSummary(r1) + '</div>' + qrBtns('chat-qr', qr.map(q => [q, q]), state.chatQR, 'ปุ่มตอบกลับด่วน'), r1.slipTime) +
+      (state.chatQR === 'เปลี่ยนหมวด' ? chatMsg('SGQ', '--brand', 'SGQ บอทบัญชี', '<div class="bub">เลือกหมวดใหม่สำหรับ ' + baht(r1.amount) + ':</div>' +
+        qrBtns('chat-cat', CATS.map(c => [c.key, c.name]), r1.category, 'เลือกหมวด'), 'เมื่อสักครู่') : '') +
+      (state.chatCat ? chatMsg('SGQ', '--brand', 'SGQ บอทบัญชี', '<div class="bub">✅ เปลี่ยนหมวดเป็น ' + esc(catOf(r1.category).name) + ' แล้ว</div>', 'เมื่อสักครู่') : '') +
     '</div>';
   const ms = monthsWithData();
-  const chipsOf = (items, sw) => items.map(x => '<span class="tchip">' + (sw ? '<i ' + bg(x.color) + '></i>' : '') + esc(sw ? x.name : x) + '</span>').join('');
-  const addUI = (kind, label) =>
-    '<button type="button" class="tchip" data-act="set-add" data-kind="' + kind + '" aria-expanded="' + state.setOpen[kind] + '" aria-controls="set-' + kind + '-row">+ เพิ่ม</button>' +
-    '</div><div class="addrow" id="set-' + kind + '-row"' + (state.setOpen[kind] ? '' : ' hidden') + '>' +
-    '<label class="sr" for="set-' + kind + '-new">' + label + '</label><input id="set-' + kind + '-new" placeholder="' + label + '" maxlength="40" autocomplete="off" aria-describedby="set-' + kind + '-err">' +
-    '<button type="button" class="btn primary sm" data-act="set-save" data-kind="' + kind + '">เพิ่ม</button>' +
-    '<button type="button" class="btn ghost sm" data-act="set-cancel" data-kind="' + kind + '">ยกเลิก</button></div>' +
-    '<div class="err" id="set-' + kind + '-err" hidden></div>';
   const dis = t => '<button type="button" class="btn ghost" disabled aria-describedby="exp-note">' + t + '</button>';
   $('v-menu').innerHTML =
     '<div class="shead"><h2 id="h-menu" tabindex="-1">เมนู</h2></div>' +
@@ -1764,9 +1784,8 @@ function renderMenu(){
           '<p class="hint" id="exp-note">ใช้ได้ในระบบจริง</p></div>' +
         '<div class="card"><h3>ตั้งค่า</h3>' +
           '<div class="set"><h4>นโยบายการตรวจ</h4><p class="policy">บันทึกอัตโนมัติ · ตรวจเฉพาะ ซ้ำ / AI ไม่มั่นใจ / ไม่ระบุโครงการ / หัก ณ ที่จ่ายไม่ชัด</p><p class="hint">ผู้ตรวจ: แอดมิน และผู้ได้รับมอบอำนาจ</p></div>' +
-          '<div class="set"><h4>หมวดค่าใช้จ่าย</h4><div class="tchips">' + chipsOf(CATS, true) + addUI('cat', 'ชื่อหมวดใหม่') +
-            '<p class="hint" style="margin-top:6px">หมวดใหม่ใช้สีเทา — สีหลักจำกัด 8 สี เพื่อให้แยกได้ชัดรวมถึงผู้ที่มีภาวะตาบอดสี</p></div>' +
-          '<div class="set"><h4>โครงการ</h4><p class="hint">ทุกรายการผูกกับโครงการ · ค่าใช้จ่ายส่วนกลางใช้ “' + NO_PROJ + '”</p><div class="tchips">' + chipsOf(PROJECTS, false) + addUI('proj', 'ชื่อโครงการใหม่') + '</div>' +
+          '<div class="set"><h4>หมวดค่าใช้จ่าย</h4>' + manageHTML('cat') + '<p class="hint" style="margin-top:8px">สีหลัก 8 สีผ่านการตรวจสำหรับผู้มีภาวะตาบอดสี ใช้ครบแล้วจะเลือกสีเทาให้ · “อื่นๆ” รับรายการเมื่อลบหมวด</p></div>' +
+          '<div class="set"><h4>โครงการ</h4><p class="hint">ทุกรายการผูกกับโครงการ · ค่าใช้จ่ายส่วนกลางใช้ “' + NO_PROJ + '”</p>' + manageHTML('proj') + '</div>' +
           '<div class="set"><h4>บัญชีบริษัท</h4><p class="hint">เงินที่โอนเข้าบัญชีเหล่านี้บันทึกเป็นรายรับ</p>' +
             COMPANY_ACCTS.map(a => '<div class="acct"><span class="bk" ' + bg(BANKS[a.bank].color) + ' aria-hidden="true">' + BANKS[a.bank].code.slice(0, 3) + '</span><span class="ad"><b class="num">' + BANKS[a.bank].code + ' ' + a.acct + '</b><small>' + esc(COMPANY + ' · ' + a.label) + '</small></span></div>').join('') + '</div>' +
           '<div class="set"><h4>สิทธิ์การใช้งาน</h4>' +
@@ -1781,6 +1800,7 @@ function renderMenu(){
           '<li>“วันนี้” ของตัวอย่าง = ' + fmtDate(TODAY_ISO) + '</li></ul></div>' +
       '</div>' +
     '</div>';
+  ['cat', 'proj'].forEach(k => { if (state.setOpen[k] && state.draft[k]) $('set-' + k + '-new').value = state.draft[k]; });
   updateExportSum();
 }
 function updateExportSum(){
@@ -1788,17 +1808,95 @@ function updateExportSum(){
   const recs = monthRecs(el.value), t = taxSums(recs);
   $('exp-sum').textContent = monthLabel(el.value) + ' · ' + recs.length + ' รายการ · รายจ่าย ' + baht(outTotal(recs)) + ' · รายรับ ' + baht(inTotal(recs)) + ' · หัก ณ ที่จ่าย ' + baht(t.wht) + ' · ภาษีซื้อ ' + baht(t.vat);
 }
-function saveSetting(kind){
-  const input = $('set-' + kind + '-new'), err = $('set-' + kind + '-err'), name = input.value.trim();
-  const exists = kind === 'cat' ? CATS.some(c => c.name === name) : PROJECTS.includes(name);
-  const msg = !name ? 'กรุณาพิมพ์ชื่อ' : exists ? 'มีชื่อนี้อยู่แล้ว' : '';
-  if (msg){ err.textContent = msg; err.hidden = false; input.setAttribute('aria-invalid', 'true'); input.focus(); return; }
-  if (kind === 'cat') CATS.push({key:'c' + CATS.length, name, color:'--cat-other'});
-  else PROJECTS.splice(PROJECTS.length - 1, 0, name);
-  state.setOpen[kind] = false;
+/* --- settings: add / delete categories & projects --- */
+const CAT_COLORS = [['--cat-alu','น้ำเงิน'],['--cat-glass','ส้ม'],['--cat-hw','เขียวอมฟ้า'],['--cat-labor','เหลือง'],['--cat-fuel','ชมพู'],['--cat-tool','เขียว'],['--cat-office','ม่วง'],['--cat-util','แดง'],['--cat-other','เทา']];
+const MG = {
+  cat: {noun:'หมวด', field:'category', fb: FALLBACK_CAT, max:30, ph:'เช่น ค่าเช่าเครื่องจักร', lock:'หมวดสำรอง ลบไม่ได้',
+    items: () => CATS.map(c => ({key:c.key, name:c.name, color:c.color})), real: () => CATS.length},
+  proj: {noun:'โครงการ', field:'project', fb: NO_PROJ, max:40, ph:'เช่น บ้านคุณสมหมาย ลาดพร้าว', lock:'โครงการสำรอง ลบไม่ได้',
+    items: () => PROJECTS.map(p => ({key:p, name:p})), real: () => PROJECTS.filter(p => p !== NO_PROJ).length}
+};
+const useOf = (kind, key) => state.recs.filter(r => r[MG[kind].field] === key).length;
+const canDel = (kind, key) => key !== MG[kind].fb && MG[kind].real() > 1;
+const freeColor = () => (CAT_COLORS.find(([t]) => !CATS.some(c => c.color === t)) || CAT_COLORS[8])[0];
+const delBtn = (kind, key) => document.querySelector('[data-act="set-del"][data-kind="' + kind + '"][data-key="' + CSS.escape(key) + '"]');
+function manageHTML(kind){
+  const m = MG[kind], items = m.items();
+  const rows = items.map(c => {
+    const n = useOf(kind, c.key), open = state.move[kind] === c.key;
+    let li = '<li class="catrow">' + (c.color ? '<i class="cdot" ' + bg(c.color) + ' aria-hidden="true"></i>' : '') + '<span class="cname">' + esc(c.name) + '</span><span class="ccount">' + n + ' รายการ</span>' +
+      (canDel(kind, c.key) ? '<button type="button" class="cdel" data-act="set-del" data-kind="' + kind + '" data-key="' + esc(c.key) + '" aria-label="ลบ' + m.noun + ' ' + esc(c.name) + '"' + (n ? ' aria-expanded="' + open + '"' : '') + '>×</button>'
+        : '<span class="clock"><span aria-hidden="true">🔒</span> ' + (c.key === m.fb ? m.lock : 'ต้องมีอย่างน้อย 1 ' + m.noun) + '</span>') + '</li>';
+    if (open) li += '<li class="catmove"><p>' + m.noun + 'นี้ถูกใช้ใน ' + n + ' รายการ · <label for="set-' + kind + '-move">ย้ายรายการไป' + m.noun + ':</label></p><div class="mvrow">' +
+      '<select class="sel" id="set-' + kind + '-move">' + items.filter(x => x.key !== c.key).map(x => '<option value="' + esc(x.key) + '"' + (x.key === m.fb ? ' selected' : '') + '>' + esc(x.name) + '</option>').join('') + '</select>' +
+      '<button type="button" class="btn dangerfill sm" data-act="set-move-ok" data-kind="' + kind + '" data-key="' + esc(c.key) + '">ย้ายและลบ</button>' +
+      '<button type="button" class="btn ghost sm" data-act="set-move-cancel" data-kind="' + kind + '" data-key="' + esc(c.key) + '">ยกเลิก</button></div></li>';
+    return li;
+  }).join('');
+  const col = state.newCatColor || freeColor();
+  return '<ul class="catlist" id="set-' + kind + '-list">' + rows + '</ul>' +
+    '<button type="button" class="tchip" data-act="set-add" data-kind="' + kind + '" aria-expanded="' + state.setOpen[kind] + '" aria-controls="set-' + kind + '-row">+ เพิ่ม</button>' +
+    '<div class="addform" id="set-' + kind + '-row"' + (state.setOpen[kind] ? '' : ' hidden') + '>' +
+      '<label class="flabel" for="set-' + kind + '-new">ชื่อ' + m.noun + 'ใหม่</label><input class="sel" id="set-' + kind + '-new" placeholder="' + m.ph + '" maxlength="' + m.max + '" autocomplete="off" aria-describedby="set-' + kind + '-err">' +
+      (kind === 'cat' ? '<div class="flabel" id="set-cat-coll">สี</div><div class="swatches" role="group" aria-labelledby="set-cat-coll">' + CAT_COLORS.map(([t, n]) => {
+        const u = CATS.find(c => c.color === t);
+        return '<button type="button" class="sw" data-act="cat-color" data-val="' + t + '" ' + bg(t) + ' aria-pressed="' + (t === col) + '" aria-label="สี' + n + (u ? ' (ใช้กับ ' + esc(u.name) + ')' : '') + '"></button>';
+      }).join('') + '</div>' : '') +
+      '<div class="addrow"><button type="button" class="btn primary sm" data-act="set-save" data-kind="' + kind + '">เพิ่ม' + m.noun + '</button><button type="button" class="btn ghost sm" data-act="set-cancel" data-kind="' + kind + '">ยกเลิก</button></div>' +
+    '</div><div class="err" id="set-' + kind + '-err" hidden></div>';
+}
+// refresh views that cache category/project markup
+function listsChanged(){
+  if ($('add-cat')) syncAddCats();
+  const ap = $('add-proj'); if (ap){ const cur = ap.value; ap.innerHTML = projOptions(PROJECTS.includes(cur) ? cur : NO_PROJ); }
   renderMenu();
-  toast((kind === 'cat' ? 'เพิ่มหมวด “' : 'เพิ่มโครงการ “') + name + '” แล้ว');
-  const b = document.querySelector('[data-act="set-add"][data-kind="' + kind + '"]'); if (b) b.focus();
+}
+function saveSetting(kind){
+  const m = MG[kind], input = $('set-' + kind + '-new'), err = $('set-' + kind + '-err'), name = input.value.trim().replace(/\s+/g, ' ');
+  const names = kind === 'cat' ? CATS.concat(INCOME_CATS).map(c => c.name) : PROJECTS;
+  const dup = names.some(x => x.trim().toLowerCase() === name.toLowerCase());
+  const msg = !name ? 'กรุณาระบุชื่อ' + m.noun : name.length > m.max ? 'ชื่อ' + m.noun + 'ยาวได้ไม่เกิน ' + m.max + ' ตัวอักษร' : dup ? 'มี' + m.noun + 'นี้อยู่แล้ว' : '';
+  if (msg){ err.textContent = msg; err.hidden = false; input.setAttribute('aria-invalid', 'true'); input.focus(); announce(msg); return; }
+  let key = name;
+  if (kind === 'cat'){
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'cat';
+    do { key = slug + '-' + (state.catSeq++); } while (CATS.concat(INCOME_CATS).some(c => c.key === key));
+    const fi = CATS.findIndex(c => c.key === FALLBACK_CAT);
+    CATS.splice(fi < 0 ? CATS.length : fi, 0, {key, name, color: state.newCatColor || freeColor()});
+    state.newCatColor = null;
+  } else {
+    const fi = PROJECTS.indexOf(NO_PROJ);
+    PROJECTS.splice(fi < 0 ? PROJECTS.length : fi, 0, name);
+  }
+  state.setOpen[kind] = false; state.draft[kind] = '';
+  listsChanged();
+  toast('เพิ่ม' + m.noun + ' ‘' + name + '’ แล้ว'); announce('เพิ่ม' + m.noun + ' ' + name + ' แล้ว');
+  const b = delBtn(kind, key); if (b) b.focus();
+}
+function deleteItem(kind, key, repl){
+  const m = MG[kind], items = m.items(), i = items.findIndex(x => x.key === key);
+  if (i < 0 || !canDel(kind, key)) return;
+  const name = items[i].name, moved = state.recs.filter(r => r[m.field] === key);
+  const to = repl && repl !== key && items.some(x => x.key === repl) ? repl : m.fb;
+  moved.forEach(r => { r[m.field] = to; if (kind === 'proj' && to !== NO_PROJ) r.projUnknown = false; });
+  if (kind === 'cat'){
+    CATS.splice(i, 1);
+    if (state.filters.cat === key) state.filters.cat = 'all';
+    const ac = $('add-cat'); if (ac){ const was = ac.value === key; syncAddCats(); if (was) ac.value = to; }
+  } else {
+    PROJECTS.splice(i, 1);
+    if (state.filters.project === key) state.filters.project = 'all';
+    const ap = $('add-proj'); if (ap && ap.value === key){ ap.innerHTML = projOptions(to); }
+    if (state.chatPick === key) state.chatPick = to;
+  }
+  state.move[kind] = null;
+  listsChanged();
+  const label = kind === 'cat' ? catOf(to).name : to;
+  const msg = moved.length ? 'ย้าย ' + moved.length + ' รายการไป ‘' + label + '’ และลบ' + m.noun + 'แล้ว' : 'ลบ' + m.noun + ' ‘' + name + '’ แล้ว';
+  toast(msg); announce(msg);
+  const after = m.items(), next = after[i] || after[i - 1];
+  const b = (next && delBtn(kind, next.key)) || document.querySelector('[data-act="set-add"][data-kind="' + kind + '"]');
+  if (b) b.focus();
 }
 
 /* --- navigation --- */
@@ -1924,7 +2022,18 @@ document.addEventListener('click', e => {
     }
     case 'rv-ignore': r.status = 'rejected'; resolveCard(id, 'ไม่นับรายการนี้แล้ว'); break;
     case 'add-clear-file': addFile = null; $('add-file').value = ''; $('add-preview').hidden = true; $('add-file').focus(); break;
-    case 'chat-qr': state.chatQR = el.dataset.val; renderMenu(); refocus(act, el.dataset.val); toast('ตัวอย่าง — ในระบบจริงบอทจะส่งตัวเลือกให้ในกลุ่ม'); break;
+    case 'chat-qr': state.chatQR = el.dataset.val; renderMenu(); refocus(act, el.dataset.val); if (el.dataset.val !== 'เปลี่ยนหมวด') toast('ตัวอย่าง — ในระบบจริงบอทจะส่งตัวเลือกให้ในกลุ่ม'); break;
+    case 'chat-cat': { const rec = byId(CHAT_REC); rec.category = el.dataset.val; state.chatCat = el.dataset.val; renderMenu(); refocus(act, el.dataset.val); toast('เปลี่ยนหมวดเป็น ‘' + catOf(rec.category).name + '’ แล้ว'); break; }
+    case 'set-del': {
+      const k = el.dataset.kind, key = el.dataset.key;
+      if (useOf(k, key)){ state.move[k] = state.move[k] === key ? null : key; renderMenu();
+        const sel = $('set-' + k + '-move'); if (sel){ sel.focus(); announce(MG[k].noun + 'นี้ถูกใช้ใน ' + useOf(k, key) + ' รายการ เลือกที่จะย้ายไป'); } else { const b = delBtn(k, key); if (b) b.focus(); } }
+      else armConfirm(el, 'ยืนยันลบ', () => deleteItem(k, key));
+      break;
+    }
+    case 'set-move-ok': deleteItem(el.dataset.kind, el.dataset.key, $('set-' + el.dataset.kind + '-move').value); break;
+    case 'set-move-cancel': { const k = el.dataset.kind, key = el.dataset.key; state.move[k] = null; renderMenu(); const b = delBtn(k, key); if (b) b.focus(); break; }
+    case 'cat-color': state.newCatColor = el.dataset.val; el.parentElement.querySelectorAll('.sw').forEach(b => b.setAttribute('aria-pressed', String(b === el))); announce(el.getAttribute('aria-label')); break;
     case 'chat-proj': {
       const rec = byId(CHAT_ASK); rec.project = el.dataset.val; state.chatPick = el.dataset.val;
       renderMenu(); updateNav(); refocus(act, el.dataset.val); toast('ตั้งโครงการแล้ว — ยอดตามโครงการอัปเดตทุกหน้า');
@@ -1944,7 +2053,11 @@ document.addEventListener('change', e => {
   else if (t.id === 'exp-month') updateExportSum();
   else if (t.id === 'add-file') handleFile(t);
 });
-document.addEventListener('input', e => { if (e.target.id === 'add-amount') addCalc(); });
+document.addEventListener('input', e => {
+  const id = e.target.id;
+  if (id === 'add-amount') addCalc();
+  else if (/^set-(cat|proj)-new$/.test(id)){ $(id.replace('new', 'err')).hidden = true; e.target.removeAttribute('aria-invalid'); }
+});
 document.addEventListener('submit', e => {
   if (e.target.id === 'd-form'){ e.preventDefault(); saveDetail(); }
   else if (e.target.id === 'add-form'){ e.preventDefault(); submitAdd(); }
